@@ -1,0 +1,6 @@
+{
+  "name": "داشبورد هندسة المرور",
+  "description": "مرجع ميداني لحسابات هندسة المرور والسلامة المرورية حسب كود الطرق السعودي والمراجع الدولية",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
