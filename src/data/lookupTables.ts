@@ -41,9 +41,9 @@ export const ROADSIDE_DESIGN_LOOKUP = [
   { speed: 90, lr: 115, ls: 2.3, steel_flare: 13, concrete_flare: 16 },
   { speed: 100, lr: 130, ls: 2.6, steel_flare: 14, concrete_flare: 18 },
   { speed: 110, lr: 145, ls: 3.0, steel_flare: 15, concrete_flare: 20 },
-  { speed: 120, lr: 160, ls: 3.2, steel_flare: 15, concrete_flare: 20 },
-  { speed: 130, lr: 175, ls: 3.5, steel_flare: 15, concrete_flare: 20 },
-  { speed: 140, lr: 190, ls: 3.8, steel_flare: 15, concrete_flare: 20 }
+  { speed: 120, lr: 160, ls: 3.2, steel_flare: 16, concrete_flare: 22 },
+  { speed: 130, lr: 175, ls: 3.5, steel_flare: 17, concrete_flare: 24 },
+  { speed: 140, lr: 190, ls: 3.8, steel_flare: 18, concrete_flare: 26 }
 ];
 
 // Base Clear Zone values (meters) for slope types by Speed range, simplified and engineering-safe
@@ -184,11 +184,11 @@ export const REFERENCES_DATA: ReferenceItem[] = [
   },
   {
     id: "src603",
-    nameAr: "كود الطرق السعودي 603 (شواخص المرور الهندسية)",
+    nameAr: "كود الطرق السعودي 603 (لوحات إشارات الطرق الهندسية)",
     nameEn: "Saudi Road Code 603 (Traffic Signs Manual)",
     code: "SRC-603",
-    type: "شاخصات الطرق",
-    notes: "دليل المواصفات والأشكال للشواخص المرورية الرأسية الإرشادية والتحذيرية والتنظيمية.",
+    type: "لوحات إشارات الطرق",
+    notes: "دليل المواصفات والأشكال للوحات إشارات الطرق الرأسية الإرشادية والتحذيرية والتنظيمية.",
     fileName: "603_AR.pdf"
   },
   {
@@ -215,7 +215,7 @@ export const REFERENCES_DATA: ReferenceItem[] = [
     nameEn: "MUTCD 11th Edition 2023",
     code: "MUTCD 2023",
     type: "مرجع دولي",
-    notes: "الدليل الفيدرالي الأمريكي لأجهزة تنظيم المرور والشواخص المؤقتة وعلامات الرصيف والمطبات.",
+    notes: "الدليل الفيدرالي الأمريكي لأجهزة تنظيم المرور ولوحات الإشارات المؤقتة وعلامات الرصيف والمطبات.",
     fileName: "mutcd.pdf"
   }
 ];
@@ -389,7 +389,7 @@ export const STANDARD_DRAWINGS_DATA: StandardDrawing[] = [
     titleAr: "علامات الشيفرون التوجيهية Chevron",
     titleEn: "Chevron Alignment Signs Mounting & Details",
     category: "SignsDetails",
-    categoryAr: "الشواخص المرورية",
+    categoryAr: "لوحات إشارات الطرق",
     code: "STD-SGN-CHV",
     fileName: "CHEVRON ALIGNEMT SIGN-REV.2 (1).pdf"
   },
@@ -407,7 +407,7 @@ export const STANDARD_DRAWINGS_DATA: StandardDrawing[] = [
     titleAr: "المخطط النموذجي للمناطق المدرسية",
     titleEn: "Typical Speed Control Layout in School Zones",
     category: "SignsDetails",
-    categoryAr: "الشواخص المرورية",
+    categoryAr: "لوحات إشارات الطرق",
     code: "STD-SGN-SCH",
     fileName: "المخطط النموذجي للمدارس (1).pdf"
   },
@@ -476,11 +476,20 @@ export const STANDARD_DRAWINGS_DATA: StandardDrawing[] = [
   },
   {
     id: "std_draw_29",
-    titleAr: "مرجع: الكتب",
-    titleEn: "Reference Literature and Books List",
-    category: "SignsDetails",
-    categoryAr: "الشواخص المرورية",
-    code: "STD-REF-BOOKS",
+    titleAr: "المخطط القياسي للمطبات الاهتزازية الطولية (على الأكتاف)",
+    titleEn: "Standard Longitudinal Shoulder Rumble Strips Details",
+    category: "RumbleStrips",
+    categoryAr: "المطبات الاهتزازية",
+    code: "STD-RMB-SHLD",
+    fileName: "الكتب.pdf"
+  },
+  {
+    id: "std_draw_30",
+    titleAr: "المخطط القياسي للمطبات الاهتزازية الصوتية المستعرضة للتحذير",
+    titleEn: "Standard Transverse Rumble Strips Details for Intersection Hazard Warning",
+    category: "RumbleStrips",
+    categoryAr: "المطبات الاهتزازية",
+    code: "STD-RMB-TRANS",
     fileName: "الكتب.pdf"
   }
 ];
