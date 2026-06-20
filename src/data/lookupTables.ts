@@ -422,11 +422,11 @@ export const STANDARD_DRAWINGS_DATA: StandardDrawing[] = [
   },
   {
     id: "std_draw_23",
-    titleAr: "تفاصيل عامة",
-    titleEn: "General Construction Details",
+    titleAr: "المخطط القياسي للمطبات",
+    titleEn: "Standard Road Humps and Rumble Strips Details",
     category: "Construction",
     categoryAr: "تفاصيل الإنشاء",
-    code: "STD-CON-GEN",
+    code: "STD-CON-HUMP",
     fileName: "DETAILS- (1).pdf"
   },
   {
@@ -458,8 +458,8 @@ export const STANDARD_DRAWINGS_DATA: StandardDrawing[] = [
   },
   {
     id: "std_draw_27",
-    titleAr: "مخطط قياسي 03",
-    titleEn: "Standard Drawing 03 Details",
+    titleAr: "تقاطع ثلاثي بدون حارات تخزين",
+    titleEn: "Three-way Intersection Without Storage Lanes Details",
     category: "Construction",
     categoryAr: "تفاصيل الإنشاء",
     code: "STD-DRAW-03",
@@ -467,8 +467,8 @@ export const STANDARD_DRAWINGS_DATA: StandardDrawing[] = [
   },
   {
     id: "std_draw_28",
-    titleAr: "مخطط قياسي 04",
-    titleEn: "Standard Drawing 04 Details",
+    titleAr: "تقاطع ثلاثي بحارات تخزين",
+    titleEn: "Three-way Intersection With Storage Lanes Details",
     category: "Construction",
     categoryAr: "تفاصيل الإنشاء",
     code: "STD-DRAW-04",
@@ -481,15 +481,6 @@ export const STANDARD_DRAWINGS_DATA: StandardDrawing[] = [
     category: "RumbleStrips",
     categoryAr: "المطبات الاهتزازية",
     code: "STD-RMB-SHLD",
-    fileName: "الكتب.pdf"
-  },
-  {
-    id: "std_draw_30",
-    titleAr: "المخطط القياسي للمطبات الاهتزازية الصوتية المستعرضة للتحذير",
-    titleEn: "Standard Transverse Rumble Strips Details for Intersection Hazard Warning",
-    category: "RumbleStrips",
-    categoryAr: "المطبات الاهتزازية",
-    code: "STD-RMB-TRANS",
     fileName: "الكتب.pdf"
   }
 ];
