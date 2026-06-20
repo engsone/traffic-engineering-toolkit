@@ -19,15 +19,11 @@ export default function TaperLength({ onSaveCalculation }: Props) {
   const [copied, setCopied] = useState<boolean>(false);
 
   // Formulas
-  const lLowSpeed = (w * Math.pow(s, 2)) / 155.4;
   const lHighSpeed = (w * s) / 1.61;
-
-  // Recommendation logic: standard boundary is 70 km/h
-  const isHighSpeed = s >= 70;
-  const recommendedValue = isHighSpeed ? lHighSpeed : lLowSpeed;
+  const recommendedValue = lHighSpeed;
 
   const handleCopy = () => {
-    const text = `حساب طول المنطقة الانتقالية (Taper Length):\n- عرض الإزاحة (W) = ${w} م\n- السرعة (S) = ${s} كم/ساعة\n- المعادلة المنخفضة (S < 70): L = ${lLowSpeed.toFixed(2)} م\n- المعادلة المرتفعة (S >= 70): L = ${lHighSpeed.toFixed(2)} م\n- القيمة الموصى بها = ${recommendedValue.toFixed(2)} م\n- مرجع: كود الطرق السعودي 401`;
+    const text = `حساب طول المنطقة الانتقالية (Taper Length):\n- عرض الإزاحة (W) = ${w} م\n- السرعة (S) = ${s} كم/ساعة\n- المعادلة المعتمدة (S >= 70): L = ${lHighSpeed.toFixed(2)} م\n- القيمة الموصى بها = ${recommendedValue.toFixed(2)} م\n- مرجع: كود الطرق السعودي 401`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -49,15 +45,13 @@ export default function TaperLength({ onSaveCalculation }: Props) {
       },
       results: {
         "الموصى به (L) م": recommendedValue.toFixed(2),
-        "معادلة السرعات المنخفضة م": lLowSpeed.toFixed(2),
-        "معادلة السرعات المرتفعة م": lHighSpeed.toFixed(2),
+        "معادلة السرعات م": lHighSpeed.toFixed(2),
       },
       units: {
         "الموصى به (L) م": "m",
-        "معادلة السرعات المنخفضة م": "m",
-        "معادلة السرعات المرتفعة م": "m",
+        "معادلة السرعات م": "m",
       },
-      notes: `سرعة ${s} كم/ساعة، استخدام معادلة السرعات لـ ${isHighSpeed ? "70 كم/س فأكثر" : "الحالة أقل من 70 كم/س"}. المرجع: كود الطرق السعودي 401.`,
+      notes: `سرعة ${s} كم/ساعة، استخدام معادلة السرعات لـ 70 كم/س فأكثر. المرجع: كود الطرق السعودي 401.`,
       isSafe: true,
     });
     setSaved(true);
@@ -157,24 +151,16 @@ export default function TaperLength({ onSaveCalculation }: Props) {
                   <div className="mt-2 text-[11px] text-gray-500 leading-snug flex items-center gap-1">
                     <span className="inline-block w-2.5 h-2.5 rounded-full bg-brand-success"></span>
                     <span>
-                      القيمة الموصى بها بناء على معادلة السرعات {isHighSpeed ? "المرتفعة (S >= 70)" : "المنخفضة (S < 70)"}
+                      القيمة المعتمدة بناء على معادلة السرعات 70 كم/ساعة فأكثر
                     </span>
                   </div>
                 </div>
 
                 {/* Detailed Formulas */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className={`p-3 rounded-lg border ${!isHighSpeed ? "bg-emerald-50/50 border-emerald-200" : "bg-white border-slate-200"}`}>
-                    <div className="text-[10px] text-brand-muted">حالة السرعة اقل من 70 كم/س</div>
-                    <div className="text-[11px] font-mono text-gray-500 mt-1">L = (W × S²) / 155.4</div>
-                    <div className="text-lg font-mono font-bold text-slate-800 mt-1">{lLowSpeed.toFixed(2)} م</div>
-                  </div>
-
-                  <div className={`p-3 rounded-lg border ${isHighSpeed ? "bg-emerald-50/50 border-emerald-200" : "bg-white border-slate-200"}`}>
-                    <div className="text-[10px] text-brand-muted">حالة السرعة 70 كم/س فأكثر</div>
-                    <div className="text-[11px] font-mono text-gray-500 mt-1">L = (W × S) / 1.61</div>
-                    <div className="text-lg font-mono font-bold text-slate-800 mt-1">{lHighSpeed.toFixed(2)} م</div>
-                  </div>
+                <div className="p-4 bg-emerald-50/50 border border-emerald-200 rounded-lg">
+                  <div className="text-xs font-bold text-brand-primary">المعادلة المطبقة (للسرعات 70 كم/س فأكثر):</div>
+                  <div className="text-[12px] font-mono text-gray-600 mt-1">L = (W × S) / 1.61</div>
+                  <div className="text-xl font-mono font-bold text-slate-800 mt-1">{lHighSpeed.toFixed(2)} م</div>
                 </div>
               </div>
             </div>
@@ -198,7 +184,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
         <div className="mb-4 bg-brand-success/10 border-r-4 border-brand-success p-3 rounded-lg flex items-start gap-2.5">
           <Check className="w-5 h-5 text-brand-success shrink-0 mt-0.5" />
           <div className="text-xs text-gray-800 leading-relaxed">
-            <span className="font-bold">مراجعة وتصحيح الكود:</span> تم تصحيح الخطأ المطبعي الشهير للسرعة <span className="font-mono font-bold">55 كم/ساعة</span> وعرض الإزاحة <span className="font-mono font-bold">3.0 م</span> (حيث تظهر كـ 90م في بعض النسخ القديمة)، ونعتمد هنا القيمة الهندسية الصحيحة وهي <span className="font-mono font-bold text-brand-success">58م</span> لضمان دقة العمليات.
+            <span className="font-bold">مراجعة وتصحيح الكود:</span> تم تصحيح الخطأ المطبعي للسرعة <span className="font-mono font-bold">55 كم/ساعة</span> وعرض الإزاحة <span className="font-mono font-bold">3.0 م</span> (حيث تظهر كـ 90م في بعض النسخ القديمة)، ونعتمد هنا القيمة الهندسية الصحيحة وهي <span className="font-mono font-bold text-brand-success">58م</span> لضمان دقة العمليات.
           </div>
         </div>
 

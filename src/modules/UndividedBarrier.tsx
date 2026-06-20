@@ -63,7 +63,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
   const yCenter = (lhCenter / lr) * lCenter;
   const ltCenter = l0 + terminalLength + lCenter;
 
-  const maxLt = Math.max(ltYellow, ltCenter);
+  const totalLt = ltYellow + ltCenter;
   const governingCase = ltYellow >= ltCenter ? "yellow" : "centerline";
 
   const handleCopy = () => {
@@ -83,8 +83,8 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
 - الطول الإجمالي للحاجز Lt② = ${ltCenter.toFixed(2)} م
 
 النتيجة الهندسية النهائية للتركيب:
-- الطول المعتمد (الأكبر) = ${maxLt.toFixed(2)} متر
-- الحالة الحاكمة: ${governingCase === 'yellow' ? "القياس من خط الحافة الأصفر (Lt①)" : "القياس من سنتر الطريق (Lt②)"}
+- الطول المعتمد (مجموع الحسابين) = ${totalLt.toFixed(2)} متر
+- شامل حسم مساهمة Lt① و Lt② معاً لتأمين الاتجاهين.
 
 المرجع الرسمي: كود الطرق السعودي 305 تفادياً للاصطدام العكسي والتقاطعي`;
 
@@ -117,7 +117,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
         "بعد الحاجز عن الخط الأصفر (L2) م": l2,
         "بعد العائق عن الخط الأصفر (L3) م": l3,
         "عرض الحارة المعاكسة م": laneWidth,
-        "طول الجريان (LR) م": lr,
+        "طول الانحراف (LR) م": lr,
         "نسبة الانحراف a:b": `1:${flareRatio}`,
         "طول العائق الطولي (L0) م": l0,
         "طول النهاية المعتمدة م": terminalLength,
@@ -128,16 +128,16 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
         "الحساب 1: إجمالي طول الحاجز م": ltYellow.toFixed(2),
         "الحساب 2: طول الحماية م": lCenter.toFixed(2),
         "الحساب 2: إجمالي طول الحاجز م": ltCenter.toFixed(2),
-        "الطول الكلي المعتمد (الأكبر) م": maxLt.toFixed(2),
+        "الطول الكلي المعتمد (المجموع) م": totalLt.toFixed(2),
       },
       units: {
         "الحساب 1: طول الحماية م": "m",
         "الحساب 1: إجمالي طول الحاجز م": "m",
         "الحساب 2: طول الحماية م": "m",
         "الحساب 2: إجمالي طول الحاجز م": "m",
-        "الطول الكلي المعتمد (الأكبر) م": "m",
+        "الطول الكلي المعتمد (المجموع) م": "m",
       },
-      notes: `تصميم حواجز السلامة لطريق مفرد حارتين. القيمة المعتمدة هي الأكبر لتأمين حركة السير المعاكسة. كود 305. الحالة الحاكمة: ${governingCase === 'yellow' ? "القياس من خط الحافة الأصفر" : "القياس من سنتر الطريق"}.`,
+      notes: `تصميم حواجز السلامة لطريق مفرد حارتين. القيمة المعتمدة هي مجموع الحسابين (Lt① + Lt②) لتأمين حركة السير من كلا الاتجاهين. كود 305.`,
       isSafe: true
     });
     setSaved(true);
@@ -160,7 +160,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
 
         {/* Warning Memo */}
         <div className="mt-4 bg-brand-warning/10 border-r-4 border-brand-warning p-3 rounded-lg text-xs leading-relaxed text-gray-800">
-          <span className="font-bold">استخدام هندسي دقيق:</span> نعتمد الأطول من الحسابين كقيمة تركيب حتمية للسلامة لمنع تداخل مسافة الجريان للمركبات القادمة من الاتجاه المقابل وتغطية زاوية الاصطدام التبادلي بالكامل.
+          <span className="font-bold">استخدام هندسي دقيق:</span> نعتمد مجموع الحسابين (Lt① + Lt②) كقيمة تركيب حتمية للسلامة لمنع تداخل مسافة الانحراف للمركبات القادمة من كلا الاتجاهين وتغطية زاوية الاصطدام التبادلي بالكامل.
         </div>
       </div>
 
@@ -309,18 +309,16 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
         <div className="rounded-xl overflow-hidden shadow-sm transition-all duration-300" 
              style={{
                backgroundColor: '#fff7ed',
-               border: governingCase === 'yellow' ? '3px solid #f59e0b' : '1px solid #fed7aa'
+               border: '2px solid #f59e0b'
              }}>
           <div className="p-4 flex justify-between items-center text-white" style={{ backgroundColor: '#f59e0b' }}>
             <span className="font-bold text-sm text-[#1e293b] flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-800 animate-pulse"></span>
               حساب ①: القياس من الخط الأصفر (حافة الطريق)
             </span>
-            {governingCase === 'yellow' && (
-              <span className="bg-[#1e293b] text-[#f59e0b] px-2 py-0.5 rounded text-[10px] font-bold">
-                الحالة الحاكمة (الأطول)
-              </span>
-            )}
+            <span className="bg-[#1e293b] text-[#f59e0b] px-2 py-0.5 rounded text-[10px] font-bold">
+              مكون الطول Lt①
+            </span>
           </div>
 
           <div className="p-5 space-y-4">
@@ -396,18 +394,16 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
         <div className="rounded-xl overflow-hidden shadow-sm transition-all duration-300"
              style={{
                backgroundColor: '#e0f2fe',
-               border: governingCase === 'centerline' ? '3px solid #0e7490' : '1px solid #bae6fd'
+               border: '2px solid #0e7490'
              }}>
           <div className="p-4 flex justify-between items-center text-white" style={{ backgroundColor: '#0e7490' }}>
             <span className="font-bold text-sm flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-cyan-200 animate-pulse"></span>
               حساب ②: القياس من منتصف الطريق (Centerline)
             </span>
-            {governingCase === 'centerline' && (
-              <span className="bg-white text-[#0e7490] px-2 py-0.5 rounded text-[10px] font-bold">
-                الحالة الحاكمة (الأطول)
-              </span>
-            )}
+            <span className="bg-white text-[#0e7490] px-2 py-0.5 rounded text-[10px] font-bold">
+              مكون الطول Lt②
+            </span>
           </div>
 
           <div className="p-5 space-y-4">
@@ -483,13 +479,13 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
               <div className="bg-[#f59e0b] text-[#1e293b] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider">
                 التوصية الهندسية النهائية
               </div>
-              <span className="text-[11px] text-cyan-200 font-medium">المطابقة لكود الطرق السعودي 305</span>
+              <span className="text-[11px] text-cyan-200 font-medium">حسب مواصفات AASHTO</span>
             </div>
             <h3 className="text-sm md:text-base font-bold text-white mt-1 leading-relaxed">
-              طول الحاجز الكلي المعتمد للتركيب (Lt) = الأكبر من <span className="text-[#f59e0b] font-mono">Lt①</span> و <span className="text-[#38bdf8] font-mono">Lt②</span>
+              طول الحاجز الكلي المعتمد للتركيب (Lt) = مجموع <span className="text-[#f59e0b] font-mono">Lt①</span> + <span className="text-[#38bdf8] font-mono">Lt②</span>
             </h3>
             <p className="text-slate-300 text-xs leading-relaxed max-w-2xl">
-              يتم اعتماد القيمة الأكبر لتغطية المركبات الهاربة من كلا الاتجاهين وتأمين زاوية المخروط الكاملة للسلامة التبادلية على الطرق المفردة حارتين.
+              يتم دمج وجمع طولي التغطية معاً لتغطية مسافة الانحراف التبادلي والاصطدام بالكامل للمركبات القادمة من كلا الاتجاهين على الطرق غير المقسمة.
             </p>
           </div>
 
@@ -497,10 +493,10 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
                style={{ borderColor: '#f59e0b' }}>
             <span className="text-[10px] text-gray-400 font-bold uppercase">النتيجة النهائية المعتمدة</span>
             <span className="text-2xl font-mono font-extrabold text-[#f59e0b] mt-1">
-              {maxLt.toFixed(2)} م
+              {totalLt.toFixed(2)} م
             </span>
             <span className="text-[10px] text-cyan-200 mt-1 max-w-[200px] text-center leading-relaxed">
-              الحالة الحاكمة: {governingCase === 'yellow' ? "القياس من خط الحافة الأصفر (Lt①)" : "القياس من سنتر الطريق (Lt②)"}
+              مجموع Lt① ({ltYellow.toFixed(1)}م) + Lt② ({ltCenter.toFixed(1)}م)
             </span>
           </div>
         </div>

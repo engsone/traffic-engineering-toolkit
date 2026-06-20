@@ -106,7 +106,7 @@ export default function DividedBarrier({ onSaveCalculation }: Props) {
       inputs: {
         "السرعة التصميمية كم/ساعة": speed,
         "إزاحة العائق (LH) م": lh,
-        "طول الجريان (LR) م": lr,
+        "طول الانحراف (LR) م": lr,
         "طول الحاجز الموازي (L1) م": l1,
         "إزاحة الحاجز (L2) م": l2,
         "معدل الانحراف المائل (b/a)": `1:${flareRatio}`,
@@ -177,7 +177,7 @@ export default function DividedBarrier({ onSaveCalculation }: Props) {
               <span className="font-mono font-bold text-brand-primary">LH (Lateral Distance):</span> المسافة من الخط الأصفر الى أبعد نقطه للعائق (LH).
             </div>
             <div>
-              <span className="font-mono font-bold text-brand-primary">LR (Runout Length):</span> مسافة وصول المركبة للعائق (مسافة الجريان التصميمية لخروج السيارة عن المسار مأخوذة من الكود).
+              <span className="font-mono font-bold text-brand-primary">LR (Runout Length):</span> مسافة وصول المركبة للعائق (مسافة الانحراف التصميمية لخروج السيارة عن المسار).
             </div>
             <div>
               <span className="font-mono font-bold text-brand-primary">L1 (Tangent Rail):</span> الجزء المستقيم قبل الحاجز (طول الجزء المستقيم المتصل قبل بدء انحراف الحاجز).
@@ -479,14 +479,14 @@ export default function DividedBarrier({ onSaveCalculation }: Props) {
 
       {/* Speed Lookup lists */}
       <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm font-sans text-right">
-        <h4 className="font-bold text-gray-800 text-xs mb-3 border-r-4 border-brand-secondary pr-2">جدول طول الجريان LR ومعدل الانحراف الموصى به (الانحراف المائل Flare Back) - كود 305:</h4>
+        <h4 className="font-bold text-gray-800 text-xs mb-3 border-r-4 border-brand-secondary pr-2">جدول طول الانحراف LR ومعدل الانحراف الموصى به (الانحراف المائل Flare Back) - كود 305:</h4>
         
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-center border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-gray-500 font-bold">
                 <th className="p-2.5 text-right font-sans">سرعة التصميم (كم/س)</th>
-                <th className="p-2.5 font-sans justify-center">طول الجريان LR (م)</th>
+                <th className="p-2.5 font-sans justify-center">طول الانحراف LR (م)</th>
                 <th className="p-2.5 font-sans justify-center">طول المستقيم LS (م)</th>
                 <th className="p-2.5 font-sans justify-center">الانحراف المائل للحاجز المعدني (Steel Flare)</th>
                 <th className="p-2.5 font-sans justify-center">الانحراف المائل للحاجز الخرساني (Concrete Flare)</th>

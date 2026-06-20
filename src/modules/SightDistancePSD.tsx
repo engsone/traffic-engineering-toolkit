@@ -235,7 +235,7 @@ export default function SightDistancePSD({ onSaveCalculation }: Props) {
                 <ul className="list-disc pr-4 text-[11px] text-gray-800 space-y-1">
                   <li><span className="font-bold">حظر وثني للتجاوز:</span> يوصى بحظر التجاوز تماماً على هذا القطاع من الطريق.</li>
                   <li><span className="font-bold">دهان خطوط الرصيف:</span> وضع شريط دهان أصفر متصل مزدوج للحظر الطولي (No-Passing Continuous Line).</li>
-                  <li><span className="font-bold">لوحات الشواخص:</span> تثبيت الشاخصات التنظيمية المقابلة "شاخصة منع التجاوز" وفق الكود 603 على جانبي القطاع.</li>
+                  <li><span className="font-bold">لوحات إشارات الطرق:</span> تثبيت اللوحات التنظيمية المقابلة "لوحة منع التجاوز" وفق الكود 603 على جانبي القطاع.</li>
                 </ul>
               </div>
             )}

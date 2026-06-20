@@ -65,7 +65,7 @@ export default function Overview({ onNavigateToModule, lastRecord, historyLength
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-200">المرجع الهندسي الميداني الشامل</span>
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight">داشبورد هندسة المرور والسلامة</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">منصة مهندس السلامة المرورية</h1>
           <p className="text-xs text-slate-100 leading-relaxed max-w-xl font-medium">
             تطبيق الحسابات الفنية وتدقيق إجراءات الأمان الجيومترية واللوحات التحذيرية وأطوال حواجز الطرق وفقاً للكود السعودي العام ومعدلات التصميم لهيئة الطرق.
           </p>
