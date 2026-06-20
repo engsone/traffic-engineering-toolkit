@@ -63,7 +63,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
   const yCenter = (lhCenter / lr) * lCenter;
   const ltCenter = l0 + terminalLength + lCenter;
 
-  const totalLt = ltYellow + ltCenter;
+  const totalLt = ltYellow + ltCenter - l0;
   const governingCase = ltYellow >= ltCenter ? "yellow" : "centerline";
 
   const handleCopy = () => {
@@ -86,7 +86,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
 - الطول المعتمد (مجموع الحسابين) = ${totalLt.toFixed(2)} متر
 - شامل حسم مساهمة Lt① و Lt② معاً لتأمين الاتجاهين.
 
-المرجع الرسمي: كود الطرق السعودي 305 تفادياً للاصطدام العكسي والتقاطعي`;
+المرجع الرسمي: مواصفات AASHTO تفادياً للاصطدام العكسي والتقاطعي`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -137,7 +137,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
         "الحساب 2: إجمالي طول الحاجز م": "m",
         "الطول الكلي المعتمد (المجموع) م": "m",
       },
-      notes: `تصميم حواجز السلامة لطريق مفرد حارتين. القيمة المعتمدة هي مجموع الحسابين (Lt① + Lt②) لتأمين حركة السير من كلا الاتجاهين. كود 305.`,
+      notes: `تصميم حواجز السلامة لطريق مفرد حارتين. القيمة المعتمدة هي مجموع الحسابين (Lt① + Lt②) لتأمين حركة السير من كلا الاتجاهين حسب مواصفات AASHTO.`,
       isSafe: true
     });
     setSaved(true);
@@ -155,7 +155,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
           <h2 className="text-xl font-bold text-brand-primary">تصميم حواجز الحماية المعدنية للأكتاف — طرق مفردة (حارتين ثنائية السير)</h2>
         </div>
         <p className="text-brand-muted text-sm leading-relaxed">
-          على الطرق المفردة غير المقسمة (Undivided Roads)، تكون المركبات معرضة لخطر الانحراف والاصطدام بالحواجز من كلا الاتجاهين. لذلك، <span className="font-bold text-brand-danger">يُلزِم الكود السعودي 305 بإجراء الحسابات الفنية مرتين متتاليتين</span>: الأولى بقياس البعد من خط الحافة الأصفر المعمر والكتف، والثانية بقياس البعد عن خط منتصف الطريق الفاصل الفعلي (Road Centerline).
+          على الطرق المفردة غير المقسمة (Undivided Roads)، تكون المركبات معرضة لخطر الانحراف والاصطدام بالحواجز من كلا الاتجاهين. لذلك، <span className="font-bold text-brand-danger">تُلزم مواصفات AASHTO بإجراء الحسابات الفنية مرتين متتاليتين</span>: الأولى بقياس البعد من خط الحافة الأصفر، والثانية بقياس البعد عن خط منتصف الطريق الفاصل الفعلي (Road Centerline).
         </p>
 
         {/* Warning Memo */}
@@ -485,7 +485,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
               طول الحاجز الكلي المعتمد للتركيب (Lt) = مجموع <span className="text-[#f59e0b] font-mono">Lt①</span> + <span className="text-[#38bdf8] font-mono">Lt②</span>
             </h3>
             <p className="text-slate-300 text-xs leading-relaxed max-w-2xl">
-              يتم دمج وجمع طولي التغطية معاً لتغطية مسافة الانحراف التبادلي والاصطدام بالكامل للمركبات القادمة من كلا الاتجاهين على الطرق غير المقسمة.
+              مجموع الحسابين مع حسم طول العائق L0 مرة واحدة فقط (غير مكرّر)، ويجب تنفيذ نهايتين ماصّتين للصدمات — واحدة عند كل طرف.
             </p>
           </div>
 
