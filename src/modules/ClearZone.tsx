@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { BASE_CLEAR_ZONE_TABLE, CLEAR_ZONE_PRT_VALUES } from "../data/lookupTables";
 import { CalculationRecord } from "../types";
 import { Copy, Save, RotateCcw, Check, Plus, AlertTriangle, Table } from "lucide-react";
+import ClearZoneChart from "../components/ClearZoneChart";
 
 interface Props {
   onSaveCalculation: (calc: Omit<CalculationRecord, "id" | "timestamp">) => void;
@@ -289,6 +290,8 @@ export default function ClearZone({ onSaveCalculation }: Props) {
           </table>
         </div>
       </div>
+      {/* شارت الخلوص التفاعلي (لا يغيّر أي رقم) */}
+      <ClearZoneChart speed={speed} slopeKey={slopeKey} clearZone={baseClearZone} />
     </div>
   );
 }

@@ -6,6 +6,8 @@
 import React, { useState, useEffect } from "react";
 import { CalculationRecord } from "../types";
 import { Copy, Save, RotateCcw, Check, AlertTriangle, ShieldAlert } from "lucide-react";
+import BarrierLayoutDiagram from "../components/BarrierLayoutDiagram";
+import BarrierTypesTable from "../components/BarrierTypesTable";
 import { ROADSIDE_DESIGN_LOOKUP } from "../data/lookupTables";
 
 interface Props {
@@ -532,6 +534,9 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
           </div>
         </div>
       </div>
+      {/* إضافات بصرية مرجعية (لا تؤثر على الحسابات) */}
+      <BarrierLayoutDiagram lh={lhYellow} lr={lr} l1={l1} l2={l2} l0={l0} terminal={terminalLength} L={lYellow} Y={yYellow} Lt={totalLt} directionLabel={"من الخط الأصفر"} />
+      <BarrierTypesTable />
     </div>
   );
 }

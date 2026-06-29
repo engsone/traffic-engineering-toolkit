@@ -7,6 +7,8 @@ import React, { useState, useEffect } from "react";
 import { ROADSIDE_DESIGN_LOOKUP, BASE_CLEAR_ZONE_TABLE } from "../data/lookupTables";
 import { CalculationRecord } from "../types";
 import { Copy, Save, RotateCcw, Check, AlertTriangle, HelpCircle, Shield } from "lucide-react";
+import BarrierLayoutDiagram from "../components/BarrierLayoutDiagram";
+import BarrierTypesTable from "../components/BarrierTypesTable";
 
 interface Props {
   onSaveCalculation: (calc: Omit<CalculationRecord, "id" | "timestamp">) => void;
@@ -506,6 +508,9 @@ export default function DividedBarrier({ onSaveCalculation }: Props) {
           </table>
         </div>
       </div>
+      {/* إضافات بصرية مرجعية (لا تؤثر على الحسابات) */}
+      <BarrierLayoutDiagram lh={lh} lr={lr} l1={l1} l2={l2} l0={l0} terminal={terminalLength} lc={lc} L={finalL} Y={finalY} Lt={finalLt} isLhExceedsLc={isLhExceedsLc} />
+      <BarrierTypesTable />
     </div>
   );
 }
