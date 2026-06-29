@@ -22,6 +22,19 @@ body {
   color: #636569;
 }
 
+/*
+  Per-section color coding:
+  Each navigation group recolors the page accent (brand-primary) for its own
+  pages only, via CSS variable scope. This recolors all the accent usages
+  inside every module automatically — no module code is touched.
+*/
+main[data-group="safety"]    { --color-brand-primary: #A8483D; } /* حسابات السلامة - طوبي */
+main[data-group="barriers"]  { --color-brand-primary: #C6A230; } /* حواجز وحمايات - ذهبي */
+main[data-group="geometric"] { --color-brand-primary: #3E7761; } /* التصميم الجيومتري - أخضر */
+main[data-group="library"]   { --color-brand-primary: #7B6756; } /* مكتبة ومستندات - بُنّي */
+main[data-group="archive"]   { --color-brand-primary: #636569; } /* أرشيف وتدقيق - رمادي */
+/* "عام"/الرئيسية يبقى على الأزرق الافتراضي #407189 */
+
 /* Custom scrollbar for professional look */
 ::-webkit-scrollbar {
   width: 6px;
@@ -37,4 +50,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
-
