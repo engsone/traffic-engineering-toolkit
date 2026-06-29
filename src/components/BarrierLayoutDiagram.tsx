@@ -16,10 +16,11 @@ interface DiagramProps {
   Lt: number;
   lc?: number;
   isLhExceedsLc?: boolean;
-  directionLabel?: string;
+  title?: string;
 }
 
 const C = {
+  ink: "#1e293b",
   primary: "#407189",
   success: "#3E7761",
   warning: "#C6A230",
@@ -30,143 +31,107 @@ const C = {
 
 const f = (n: number): string => (isFinite(n) ? n.toFixed(1) : "0.0");
 
-function Tick({ x, y, vertical }: { x: number; y: number; vertical?: boolean }) {
-  return vertical ? (
-    <line x1={x - 4} y1={y} x2={x + 4} y2={y} stroke={C.muted} strokeWidth={1} />
-  ) : (
-    <line x1={x} y1={y - 4} x2={x} y2={y + 4} stroke={C.muted} strokeWidth={1} />
+function HDim({ x1, x2, y, label, color }: { x1: number; x2: number; y: number; label: string; color: string }) {
+  return (
+    <g>
+      <line x1={x1} y1={y} x2={x2} y2={y} stroke={color} strokeWidth={1} />
+      <line x1={x1} y1={y - 4} x2={x1} y2={y + 4} stroke={color} strokeWidth={1} />
+      <line x1={x2} y1={y - 4} x2={x2} y2={y + 4} stroke={color} strokeWidth={1} />
+      <text x={(x1 + x2) / 2} y={y - 6} fill={color} fontSize={12} fontWeight={700} textAnchor="middle" style={{ paintOrder: "stroke", stroke: "#fff", strokeWidth: 3 }}>{label}</text>
+    </g>
   );
 }
 
-function DimLabel({ x, y, text, color, vertical }: { x: number; y: number; text: string; color: string; vertical?: boolean }) {
+function VDim({ x, y1, y2, label, color }: { x: number; y1: number; y2: number; label: string; color: string }) {
   return (
-    <text
-      x={x}
-      y={y}
-      fill={color}
-      fontSize={11}
-      fontWeight={700}
-      textAnchor="middle"
-      dominantBaseline="central"
-      transform={vertical ? `rotate(-90 ${x} ${y})` : undefined}
-      style={{ paintOrder: "stroke", stroke: "#ffffff", strokeWidth: 3, strokeLinejoin: "round" }}
-    >
-      {text}
-    </text>
+    <g>
+      <line x1={x} y1={y1} x2={x} y2={y2} stroke={color} strokeWidth={1} />
+      <line x1={x - 4} y1={y1} x2={x + 4} y2={y1} stroke={color} strokeWidth={1} />
+      <line x1={x - 4} y1={y2} x2={x + 4} y2={y2} stroke={color} strokeWidth={1} />
+      <text x={x} y={(y1 + y2) / 2} fill={color} fontSize={12} fontWeight={700} textAnchor="middle" transform={`rotate(-90 ${x} ${(y1 + y2) / 2})`} style={{ paintOrder: "stroke", stroke: "#fff", strokeWidth: 3 }}>{label}</text>
+    </g>
   );
 }
 
 export default function BarrierLayoutDiagram(p: DiagramProps) {
-  // Schematic fixed layout. Numbers are live; geometry is illustrative only.
-  const edgeY = 272;   // road edge (yellow line) y
-  const czY = 64;      // clear zone boundary y
-  const hazardX = 78;  // hazard box left
-  const hazardW = 86;  // hazard box width (schematic)
-  const hazardY = 92;  // hazard box top
-  const hazardH = 26;
-  // Barrier schematic: tangent part near hazard then flares toward road edge
-  const bStartX = 168;             // upstream start (tangent) x
-  const bTangentEndX = 244;        // end of tangent (L1)
-  const bDownX = 498;              // downstream end (flared) near edge
-  const bTopY = hazardY + hazardH + 14; // barrier line near hazard side
-  const bBotY = edgeY - 18;        // barrier near road edge
+  // layout (faithful to Fig 1.15.9: hazard left, barrier flares right to crashworthy terminal,
+  // runout line L_R as a long diagonal from terminal area up to back of hazard)
+  const yTop = 46;     // adjacent clear zone line
+  const yEdge = 392;   // edge of traveled way
+  const yAdj = 446;    // adjacent traffic centerline (dashed)
+  const hzX = 158, hzW = 56, hzTop = 150, hzBot = 326; // hazard box
+  const bTanX1 = hzX + hzW, bTanX2 = bTanX1 + 80;      // tangent (L1) segment
+  const termX = 770, termY = 372;                       // crashworthy terminal end
+  const bTanY = 320;                                    // barrier near hazard
+
+  const posts: number[] = [0, 0.12, 0.24, 0.36, 0.48, 0.6, 0.72, 0.84, 0.96];
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-4 overflow-x-auto shadow-sm">
-      <div className="text-sm font-bold text-brand-primary mb-1">المخطط التخطيطي للحاجز — شكل 1.15.9 (AASHTO)</div>
-      <div className="text-[11px] text-brand-muted mb-3">الأبعاد تتحدّث تلقائياً من المدخلات والنتائج (مخطط تخطيطي وليس بمقياس رسم دقيق).</div>
-      <svg viewBox="0 0 620 330" className="w-full" style={{ minWidth: 560 }}>
-        {/* Clear zone boundary */}
-        <line x1={28} y1={czY} x2={592} y2={czY} stroke={C.secondary} strokeWidth={1.5} strokeDasharray="7 5" />
-        <text x={36} y={czY - 7} fill={C.secondary} fontSize={11} fontWeight={700}>حدّ حرم الأمان (Clear Zone)</text>
+      <div className="text-sm font-bold text-brand-primary mb-1">{p.title || "مخطط الحاجز — شكل 1.15.9 (Approach Barrier Layout)"}</div>
+      <div className="text-[11px] text-brand-muted mb-3">مطابق لشكل آشتو؛ الأبعاد تتحدّث تلقائياً من المدخلات والنتائج.</div>
+      <svg viewBox="0 0 940 470" className="w-full" style={{ minWidth: 680 }}>
+        {/* top adjacent clear zone line */}
+        <line x1={24} y1={yTop} x2={916} y2={yTop} stroke={C.ink} strokeWidth={1.5} />
+        <text x={910} y={yTop - 7} fill={C.muted} fontSize={11} fontWeight={700} textAnchor="end">خط حرم الأمان للاتجاه المجاور</text>
 
-        {/* Road edge (yellow line) */}
-        <line x1={28} y1={edgeY} x2={592} y2={edgeY} stroke={C.warning} strokeWidth={3} />
-        <text x={584} y={edgeY + 16} fill={C.warning} fontSize={11} fontWeight={700} textAnchor="end">حافة المسار (الخط الأصفر)</text>
-        {/* Direction of travel arrow */}
-        <g>
-          <line x1={120} y1={edgeY + 14} x2={56} y2={edgeY + 14} stroke={C.muted} strokeWidth={1.5} />
-          <path d={`M56,${edgeY + 14} l9,-4 l0,8 Z`} fill={C.muted} />
-          <text x={126} y={edgeY + 18} fill={C.muted} fontSize={10} fontWeight={700}>اتجاه السير</text>
+        {/* edge of traveled way (solid) + adjacent traffic (dashed) */}
+        <line x1={24} y1={yEdge} x2={916} y2={yEdge} stroke={C.ink} strokeWidth={2} />
+        <text x={470} y={yEdge + 16} fill={C.muted} fontSize={11} fontWeight={700} textAnchor="middle">حافة المسار (Edge of traveled way)</text>
+        <line x1={24} y1={yAdj} x2={916} y2={yAdj} stroke={C.muted} strokeWidth={1} strokeDasharray="9 6" />
+        <line x1={150} y1={yAdj + 16} x2={92} y2={yAdj + 16} stroke={C.muted} strokeWidth={1.5} />
+        <path d={`M92,${yAdj + 16} l9,-4 l0,8 Z`} fill={C.muted} />
+        <text x={158} y={yAdj + 20} fill={C.muted} fontSize={10} fontWeight={700}>الاتجاه المجاور (Adjacent traffic)</text>
+
+        {/* hazard */}
+        <rect x={hzX} y={hzTop} width={hzW} height={hzBot - hzTop} fill={C.secondary} fillOpacity={0.22} stroke={C.danger} strokeWidth={1.5} />
+        <line x1={hzX + hzW / 2} y1={hzTop} x2={hzX + hzW / 2 + 26} y2={hzTop - 22} stroke={C.danger} strokeWidth={1} />
+        <text x={hzX + hzW / 2 + 30} y={hzTop - 24} fill={C.danger} fontSize={12} fontWeight={700}>العائق (Hazard)</text>
+
+        {/* runout line L_R : long diagonal from terminal/shy area up to back-top of hazard */}
+        <line x1={840} y1={yAdj} x2={hzX} y2={hzTop + 18} stroke={C.muted} strokeWidth={1.25} strokeDasharray="7 5" />
+
+        {/* barrier: tangent then flared posts toward terminal */}
+        <line x1={bTanX1} y1={bTanY} x2={bTanX2} y2={bTanY} stroke={C.primary} strokeWidth={3.5} />
+        <line x1={bTanX2} y1={bTanY} x2={termX} y2={termY} stroke={C.primary} strokeWidth={3.5} />
+        {posts.map((t, i) => {
+          const x = bTanX2 + (termX - bTanX2) * t;
+          const y = bTanY + (termY - bTanY) * t;
+          return <circle key={i} cx={x} cy={y} r={3} fill="#fff" stroke={C.primary} strokeWidth={2} />;
+        })}
+        {/* crashworthy terminal curl */}
+        <path d={`M${termX},${termY} q16,2 16,14 q0,10 -12,8`} fill="none" stroke={C.success} strokeWidth={3} strokeLinecap="round" />
+        <line x1={termX + 6} y1={termY - 30} x2={termX + 18} y2={termY + 6} stroke={C.success} strokeWidth={1} />
+        <text x={termX + 22} y={termY - 30} fill={C.success} fontSize={11} fontWeight={700}>نهاية ماصّة للصدمات</text>
+
+        {/* flare ratio a:b triangle */}
+        <g transform="translate(430,338)">
+          <path d="M0,0 L52,0 L52,-15 Z" fill="none" stroke={C.ink} strokeWidth={1.25} />
+          <text x={26} y={12} fill={C.ink} fontSize={11} fontWeight={700} textAnchor="middle">a</text>
+          <text x={58} y={-6} fill={C.ink} fontSize={11} fontWeight={700}>b</text>
         </g>
 
-        {/* LR dimension (runout) at very top */}
-        <line x1={hazardX} y1={42} x2={bDownX} y2={42} stroke={C.muted} strokeWidth={1} />
-        <Tick x={hazardX} y={42} />
-        <Tick x={bDownX} y={42} />
-        <DimLabel x={(hazardX + bDownX) / 2} y={34} text={`LR (طول الانحراف) = ${f(p.lr)} م`} color={C.muted} />
-
-        {/* Hazard box */}
-        <rect x={hazardX} y={hazardY} width={hazardW} height={hazardH} rx={3} fill={C.danger} fillOpacity={0.14} stroke={C.danger} strokeWidth={1.5} />
-        <text x={hazardX + hazardW / 2} y={hazardY + hazardH / 2} fill={C.danger} fontSize={11} fontWeight={700} textAnchor="middle" dominantBaseline="central">العائق</text>
-        {/* L0 dimension under hazard */}
-        <line x1={hazardX} y1={hazardY + hazardH + 8} x2={hazardX + hazardW} y2={hazardY + hazardH + 8} stroke={C.danger} strokeWidth={1} />
-        <Tick x={hazardX} y={hazardY + hazardH + 8} />
-        <Tick x={hazardX + hazardW} y={hazardY + hazardH + 8} />
-        <DimLabel x={hazardX + hazardW / 2} y={hazardY + hazardH + 18} text={`L0 = ${f(p.l0)} م`} color={C.danger} />
-
-        {/* LH dimension (vertical) from edge up to hazard */}
-        <line x1={48} y1={edgeY} x2={48} y2={hazardY + hazardH} stroke={C.primary} strokeWidth={1} />
-        <Tick x={48} y={edgeY} vertical />
-        <Tick x={48} y={hazardY + hazardH} vertical />
-        <DimLabel x={40} y={(edgeY + hazardY + hazardH) / 2} text={`LH = ${f(p.lh)} م`} color={C.primary} vertical />
-
-        {/* Barrier: tangent + flared posts */}
-        <g>
-          {/* tangent (L1) near hazard */}
-          <line x1={bStartX} y1={bTopY} x2={bTangentEndX} y2={bTopY} stroke={C.primary} strokeWidth={3} />
-          {/* flared part down to road edge (Length of Need L) */}
-          <line x1={bTangentEndX} y1={bTopY} x2={bDownX} y2={bBotY} stroke={C.primary} strokeWidth={3} />
-          {/* posts */}
-          {[0, 0.2, 0.4, 0.6, 0.8, 1].map((t, i) => {
-            const x = bTangentEndX + (bDownX - bTangentEndX) * t;
-            const y = bTopY + (bBotY - bTopY) * t;
-            return <line key={i} x1={x} y1={y - 5} x2={x} y2={y + 5} stroke={C.primary} strokeWidth={2} />;
-          })}
-          {[bStartX + 18, bStartX + 46].map((x, i) => (
-            <line key={`t${i}`} x1={x} y1={bTopY - 5} x2={x} y2={bTopY + 5} stroke={C.primary} strokeWidth={2} />
-          ))}
-        </g>
-        {/* L label along the flare */}
-        <DimLabel x={(bTangentEndX + bDownX) / 2 + 10} y={(bTopY + bBotY) / 2 - 12} text={`طول الحماية L = ${f(p.L)} م`} color={C.success} />
-        {/* L1 label */}
-        <DimLabel x={(bStartX + bTangentEndX) / 2} y={bTopY - 12} text={`L1 = ${f(p.l1)} م`} color={C.primary} />
-
-        {/* L2 small offset near road edge at downstream end */}
-        <line x1={bDownX} y1={bBotY} x2={bDownX} y2={edgeY} stroke={C.secondary} strokeWidth={1} />
-        <DimLabel x={bDownX + 30} y={(bBotY + edgeY) / 2} text={`L2 = ${f(p.l2)} م`} color={C.secondary} />
-        {/* Y offset of barrier start */}
-        <line x1={bStartX} y1={bTopY} x2={bStartX} y2={edgeY} stroke={C.muted} strokeWidth={0.75} strokeDasharray="3 3" />
-        <DimLabel x={bStartX - 26} y={(bTopY + edgeY) / 2} text={`Y = ${f(p.Y)} م`} color={C.muted} vertical />
-
-        {/* Crashworthy terminal at downstream end */}
-        <g>
-          <path d={`M${bDownX},${bBotY} l16,-7 l0,14 Z`} fill={C.success} />
-          <text x={bDownX + 22} y={bBotY + 4} fill={C.success} fontSize={10} fontWeight={700}>نهاية ماصّة للصدمات</text>
-        </g>
-
-        {/* LC dimension (vertical) on the right if provided */}
-        {typeof p.lc === "number" && (
-          <g>
-            <line x1={572} y1={edgeY} x2={572} y2={czY} stroke={C.secondary} strokeWidth={1} />
-            <Tick x={572} y={edgeY} vertical />
-            <Tick x={572} y={czY} vertical />
-            <DimLabel x={580} y={(edgeY + czY) / 2} text={`LC = ${f(p.lc)} م`} color={C.secondary} vertical />
-          </g>
-        )}
+        {/* dimensions */}
+        <VDim x={64} y1={yTop} y2={yAdj} label={`LC = ${f(p.lc ?? p.lh)} م`} color={C.secondary} />
+        <HDim x1={hzX} x2={840} y={92} label={`LR (طول الجريان) = ${f(p.lr)} م`} color={C.muted} />
+        <HDim x1={bTanX1} x2={termX} y={128} label={`طول الحماية المطلوب L = ${f(p.L)} م`} color={C.success} />
+        <HDim x1={bTanX1} x2={bTanX2} y={302} label={`L1 = ${f(p.l1)} م`} color={C.primary} />
+        <HDim x1={hzX} x2={hzX + hzW} y={hzBot + 16} label={`L0 = ${f(p.l0)} م`} color={C.danger} />
+        <VDim x={130} y1={hzTop} y2={yEdge} label={`LH = ${f(p.lh)} م`} color={C.ink} />
+        <VDim x={termX + 44} y1={termY} y2={yEdge} label={`Y = ${f(p.Y)} م`} color={C.muted} />
+        <VDim x={hzX + hzW + 14} y1={bTanY} y2={yEdge} label={`L2 = ${f(p.l2)} م`} color={C.secondary} />
       </svg>
 
-      {/* Live result + special-case note */}
+      {/* formula + live total + special note */}
       <div className="mt-3 flex flex-wrap items-center gap-3">
+        <div className="text-[11px] font-mono text-brand-muted bg-slate-50 border border-slate-100 rounded px-2 py-1">L = (LR − L1 − L0) / (1 − a/b)</div>
         <div className="inline-flex items-baseline gap-2 bg-brand-success/10 border border-brand-success/30 rounded-lg px-4 py-2">
           <span className="text-xs font-bold text-brand-success">الطول الكلي المعتمد Lt</span>
           <span className="text-xl font-mono font-bold text-brand-success">{f(p.Lt)}</span>
           <span className="text-xs text-brand-success">م</span>
         </div>
         {p.isLhExceedsLc && (
-          <div className="text-[11px] font-bold text-brand-warning bg-brand-warning/10 border border-brand-warning/30 rounded-lg px-3 py-2">
-            LH ≥ LC → استُخدمت قيمة LC في الحساب
-          </div>
+          <div className="text-[11px] font-bold text-brand-warning bg-brand-warning/10 border border-brand-warning/30 rounded-lg px-3 py-2">LH ≥ LC → استُخدمت قيمة LC في الحساب</div>
         )}
       </div>
     </div>
