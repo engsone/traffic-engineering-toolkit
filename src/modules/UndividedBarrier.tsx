@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { CalculationRecord } from "../types";
 import { Copy, Save, RotateCcw, Check, AlertTriangle, ShieldAlert } from "lucide-react";
 import BarrierLayoutDiagram from "../components/BarrierLayoutDiagram";
+import OpposingBarrierDiagram from "../components/OpposingBarrierDiagram";
 import BarrierTypesTable from "../components/BarrierTypesTable";
 import { ROADSIDE_DESIGN_LOOKUP } from "../data/lookupTables";
 
@@ -534,8 +535,9 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
           </div>
         </div>
       </div>
-      {/* إضافات بصرية مرجعية (لا تؤثر على الحسابات) */}
-      <BarrierLayoutDiagram lh={lhYellow} lr={lr} l1={l1} l2={l2} l0={l0} terminal={terminalLength} L={lYellow} Y={yYellow} Lt={totalLt} directionLabel={"من الخط الأصفر"} />
+      {/* إضافات بصرية مرجعية (لا تؤثر على الحسابات) — رسمان للمفرد: 1.15.9 (الأصفر) + 1.15.11 (السنتر) */}
+      <BarrierLayoutDiagram lh={lhYellow} lr={lr} l1={l1} l2={l2} l0={l0} terminal={terminalLength} L={lYellow} Y={yYellow} Lt={ltYellow} title={"مخطط الحاجز — القياس من الخط الأصفر (شكل 1.15.9)"} />
+      <OpposingBarrierDiagram lh={lhCenter} lr={lr} l1={l1} l2={l2Center} l0={l0} L={lCenter} Y={yCenter} Lt={ltCenter} title={"حاجز إضافي للاتجاه المعاكس — القياس من السنتر (شكل 1.15.11)"} />
       <BarrierTypesTable />
     </div>
   );
