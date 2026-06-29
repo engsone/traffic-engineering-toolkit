@@ -71,11 +71,11 @@ export default function OpposingBarrierDiagram(p: Props) {
       <svg viewBox="0 0 940 492" className="w-full" style={{ minWidth: 680 }}>
         {/* clear zone line */}
         <line x1={24} y1={yTop} x2={916} y2={yTop} stroke={C.ink} strokeWidth={1.5} />
-        <text x={30} y={yTop - 8} fill={C.muted} fontSize={11} fontWeight={700}>خط حرم الأمان (Clear zone line)</text>
+        <text x={210} y={yTop - 8} fill={C.muted} fontSize={11} fontWeight={700} textAnchor="middle">خط حرم الأمان (Clear zone line)</text>
 
         {/* asphalt edge (solid) */}
         <line x1={24} y1={yAsph} x2={916} y2={yAsph} stroke="#9aa0a6" strokeWidth={1.5} />
-        <text x={30} y={yAsph - 6} fill="#9aa0a6" fontSize={11} fontWeight={700}>حافة الأسفلت</text>
+        <text x={92} y={yAsph - 6} fill="#9aa0a6" fontSize={11} fontWeight={700} textAnchor="middle">حافة الأسفلت</text>
 
         {/* edge of traveled way */}
         <line x1={24} y1={yEdge} x2={916} y2={yEdge} stroke={C.ink} strokeWidth={1.5} />
@@ -84,17 +84,17 @@ export default function OpposingBarrierDiagram(p: Props) {
         {/* near lane direction (ABOVE centre) */}
         <line x1={180} y1={384} x2={120} y2={384} stroke={C.primary} strokeWidth={1.75} />
         <path d="M120,384 l9,-4 l0,8 Z" fill={C.primary} />
-        <text x={188} y={388} fill={C.primary} fontSize={12} fontWeight={700}>اتجاه السير</text>
+        <text x={232} y={388} fill={C.primary} fontSize={12} fontWeight={700} textAnchor="middle">اتجاه السير</text>
         <text x={470} y={390} fill={C.accent} fontSize={11} fontWeight={700} textAnchor="middle">⟵ حارة معاكسة 3.65 م ⟶</text>
 
         {/* CENTRE line = reference */}
         <line x1={24} y1={yCenter} x2={916} y2={yCenter} stroke={C.accent} strokeWidth={2.75} strokeDasharray="18 8" />
-        <text x={916} y={yCenter - 5} fill={C.accent} fontSize={12} fontWeight={800} textAnchor="end">محور الطريق (السنتر) — المرجع</text>
+        <text x={740} y={yCenter - 5} fill={C.accent} fontSize={12} fontWeight={800} textAnchor="middle">محور الطريق (السنتر) — المرجع</text>
 
         {/* opposing direction (BELOW centre) */}
         <line x1={120} y1={432} x2={180} y2={432} stroke={C.accent} strokeWidth={1.75} />
         <path d="M180,432 l-9,-4 l0,8 Z" fill={C.accent} />
-        <text x={188} y={436} fill={C.accent} fontSize={12} fontWeight={700}>اتجاه السير المعاكس</text>
+        <text x={270} y={436} fill={C.accent} fontSize={12} fontWeight={700} textAnchor="middle">اتجاه السير المعاكس</text>
 
         {/* hazard (right) */}
         <rect x={hzX} y={hzTop} width={hzW} height={hzBot - hzTop} fill={C.secondary} fillOpacity={0.22} stroke={C.danger} strokeWidth={1.5} />

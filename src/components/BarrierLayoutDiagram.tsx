@@ -73,11 +73,11 @@ export default function BarrierLayoutDiagram(p: DiagramProps) {
       <svg viewBox="0 0 940 470" className="w-full" style={{ minWidth: 680 }}>
         {/* clear zone line */}
         <line x1={24} y1={yTop} x2={916} y2={yTop} stroke={C.ink} strokeWidth={1.5} />
-        <text x={910} y={yTop - 8} fill={C.muted} fontSize={11} fontWeight={700} textAnchor="end">خط حرم الأمان (Clear zone line)</text>
+        <text x={760} y={yTop - 8} fill={C.muted} fontSize={11} fontWeight={700} textAnchor="middle">خط حرم الأمان (Clear zone line)</text>
 
         {/* asphalt edge (solid) */}
         <line x1={24} y1={yAsph} x2={916} y2={yAsph} stroke="#9aa0a6" strokeWidth={1.5} />
-        <text x={910} y={yAsph - 6} fill="#9aa0a6" fontSize={11} fontWeight={700} textAnchor="end">حافة الأسفلت</text>
+        <text x={852} y={yAsph - 6} fill="#9aa0a6" fontSize={11} fontWeight={700} textAnchor="middle">حافة الأسفلت</text>
 
         {/* edge of traveled way (reference) */}
         <line x1={24} y1={yEdge} x2={916} y2={yEdge} stroke={C.ink} strokeWidth={2.25} />
@@ -85,12 +85,12 @@ export default function BarrierLayoutDiagram(p: DiagramProps) {
 
         {/* road centerline (dashed) */}
         <line x1={24} y1={yCenter} x2={916} y2={yCenter} stroke={C.warning} strokeWidth={1.5} strokeDasharray="14 10" />
-        <text x={24} y={yCenter - 6} fill="#9a7d1f" fontSize={11} fontWeight={700}>محور الطريق (السنتر)</text>
+        <text x={130} y={yCenter - 6} fill="#9a7d1f" fontSize={11} fontWeight={700} textAnchor="middle">محور الطريق (السنتر)</text>
 
         {/* traffic direction (right) */}
-        <line x1={812} y1={372} x2={752} y2={372} stroke={C.primary} strokeWidth={1.75} />
+        <line x1={792} y1={372} x2={752} y2={372} stroke={C.primary} strokeWidth={1.75} />
         <path d="M752,372 l9,-4 l0,8 Z" fill={C.primary} />
-        <text x={820} y={376} fill={C.primary} fontSize={12} fontWeight={700}>اتجاه السير</text>
+        <text x={848} y={376} fill={C.primary} fontSize={12} fontWeight={700} textAnchor="middle">اتجاه السير</text>
 
         {/* hazard */}
         <rect x={hzX} y={hzTop} width={hzW} height={hzBot - hzTop} fill={C.secondary} fillOpacity={0.22} stroke={C.danger} strokeWidth={1.5} />
