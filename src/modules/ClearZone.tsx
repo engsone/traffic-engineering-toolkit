@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import { BASE_CLEAR_ZONE_TABLE, CLEAR_ZONE_PRT_VALUES } from "../data/lookupTables";
+import { BASE_CLEAR_ZONE_TABLE } from "../data/lookupTables";
 import { CalculationRecord } from "../types";
 import { Copy, Save, RotateCcw, Check, Plus, AlertTriangle, Table } from "lucide-react";
 import ClearZoneChart from "../components/ClearZoneChart";
@@ -27,9 +27,6 @@ export default function ClearZone({ onSaveCalculation }: Props) {
   // ADT calculation: Clear Zone Final = Base Clear Zone * ADT Adjustment Factor
   const finalClearZone = baseClearZone * adtClass;
 
-  // PRT lookup values
-  const currentPrtRow = CLEAR_ZONE_PRT_VALUES.find(r => r.speed === speed) || { prt12: 100, prt25: 150 };
-
   const handleCopy = () => {
     const text = `حساب الخلوص الجانبي وحرم الأمان (Clear Zone):
 - السرعة التصميمية = ${speed} كم/ساعة
@@ -37,8 +34,6 @@ export default function ClearZone({ onSaveCalculation }: Props) {
 - عامل تعديل كثافة الحركة المرورية (ADT) = ${adtClass}
 - عرض حرم الأمان الأساسي = ${baseClearZone} م
 - عرض حرم الأمان النهائي المعدل = ${finalClearZone.toFixed(2)} م
-- مسافة الإدراك والاستجابة السريعة (PRT 1.2s): ${currentPrtRow.prt12} م
-- مسافة الإدراك والاستجابة الطويلة (PRT 2.5s): ${currentPrtRow.prt25} م
 كود الطرق السعودي 305`;
 
     navigator.clipboard.writeText(text);
@@ -65,14 +60,10 @@ export default function ClearZone({ onSaveCalculation }: Props) {
       results: {
         "حرم الأمان الأساسي م": baseClearZone,
         "حرم الأمان النهائي م": finalClearZone.toFixed(2),
-        "مسافة الإدراك 1.2 ث م": currentPrtRow.prt12,
-        "مسافة الإدراك 2.5 ث م": currentPrtRow.prt25,
       },
       units: {
         "حرم الأمان الأساسي م": "m",
         "حرم الأمان النهائي م": "m",
-        "مسافة الإدراك 1.2 ث م": "m",
-        "مسافة الإدراك 2.5 ث م": "m",
       },
       notes: `تحديد عرض المنطقة الخالية من العوائق لسرعة ${speed} كم/ساعة.`,
       isSafe: true,
@@ -211,20 +202,6 @@ export default function ClearZone({ onSaveCalculation }: Props) {
                 </div>
               </div>
 
-              {/* Perception Time distances */}
-              <div className="p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
-                <div className="text-xs font-bold text-slate-700 mb-2">مسافة الإدراك والرد للتراجع (PRT) حسب الكود:</div>
-                <div className="grid grid-cols-2 gap-2 text-center text-xs text-gray-600 font-sans">
-                  <div className="p-2 bg-slate-50 rounded">
-                    <div>زمن رد فعل 1.2 ثانية</div>
-                    <div className="text-slate-900 font-mono font-bold mt-1">{currentPrtRow.prt12} متر</div>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <div>زمن رد فعل 2.5 ثانية</div>
-                    <div className="text-slate-900 font-mono font-bold mt-1">{currentPrtRow.prt25} متر</div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Custom Visual Assist Drawing */}
