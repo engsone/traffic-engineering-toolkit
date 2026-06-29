@@ -3,14 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import React from "react";
-import { BASE_CLEAR_ZONE_TABLE } from "../data/lookupTables";
-
-const C = {
-  ink: "#1e293b",
-  primary: "#407189",
-  danger: "#A8483D",
-  muted: "#636569",
-};
+import figUrl from "./clearZone_1151.png";
 
 interface ChartProps {
   speed: number;
@@ -18,103 +11,62 @@ interface ChartProps {
   clearZone: number;
 }
 
-const TABLE = BASE_CLEAR_ZONE_TABLE as unknown as Record<string, Record<string, number>>;
-
-// Embankment slopes top->bottom (steep -> flat), matching Fig 1.15.1
-const EMB: { key: string; label: string }[] = [
-  { key: "slope_3_1", label: "3:1" },
-  { key: "slope_4_1", label: "4:1" },
-  { key: "slope_5_1", label: "5:1" },
-  { key: "slope_6_1", label: "6:1" },
-  { key: "slope_8_1", label: "8:1" },
-  { key: "slope_10_1", label: "10:1" },
-];
-const CUT_LABELS = ["10:1", "8:1", "6:1", "5:1", "4:1", "3:1"];
+// AASHTO Figure 1.15.1 (Clear Zone) — the original standard figure, recoloured to
+// the platform brand. The red marker is positioned from a pixel-calibrated
+// digitisation of the figure (verified against the figure's own worked example:
+// 90 km/h, slope 6:1 -> 8 m). VISUAL ONLY — no calculation logic is touched.
 const SPEEDS = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140];
+const TABLE: Record<string, number[]> = {
+  "3:1": [3.5, 4.5, 6.5, 10.0, 14.5, 18.5, 24.0, 30.0, 34.0, 37.5],
+  "4:1": [4.1, 5.1, 6.6, 8.7, 11.1, 13.6, 16.4, 19.5, 22.3, 25.1],
+  "5:1": [3.9, 4.8, 6.0, 7.4, 9.2, 11.3, 13.8, 16.1, 18.6, 21.2],
+  "6:1": [3.7, 4.5, 5.5, 6.7, 8.0, 9.9, 12.0, 14.0, 16.2, 18.9],
+  "8:1": [3.6, 4.4, 5.4, 6.3, 7.7, 9.4, 11.4, 13.2, 15.3, 17.8],
+  "10:1": [3.4, 4.2, 5.2, 6.1, 7.6, 9.1, 11.0, 12.9, 14.8, 17.0],
+};
+const SLOPE_TOP: Record<string, number> = { "3:1": 0.065, "4:1": 0.1467, "5:1": 0.187, "6:1": 0.2186, "8:1": 0.2415, "10:1": 0.2681 };
+const KEY2LABEL: Record<string, string> = { slope_3_1: "3:1", slope_4_1: "4:1", slope_5_1: "5:1", slope_6_1: "6:1", slope_8_1: "8:1", slope_10_1: "10:1" };
+const X_AT_0 = 0.1616;
+const X_PER_M = (0.9388 - 0.1616) / 40;
+const AXIS_Y = 0.661;
 
-const X0 = 112, X40 = 718;
-const xS = (v: number) => X0 + (Math.max(0, Math.min(40, v)) / 40) * (X40 - X0);
-const embY = (i: number) => 72 + i * 33;      // 72..237
-const FLAT_Y = 268;
-const cutY = (i: number) => 300 + i * 33;      // 300..465
-const AXIS_Y = 500;
+function readCZ(label: string, speed: number): number {
+  const arr = TABLE[label];
+  if (!arr) return 0;
+  if (speed <= SPEEDS[0]) return arr[0];
+  if (speed >= SPEEDS[SPEEDS.length - 1]) return arr[arr.length - 1];
+  for (let i = 0; i < SPEEDS.length - 1; i++) {
+    if (speed >= SPEEDS[i] && speed <= SPEEDS[i + 1]) {
+      const t = (speed - SPEEDS[i]) / (SPEEDS[i + 1] - SPEEDS[i]);
+      return arr[i] + (arr[i + 1] - arr[i]) * t;
+    }
+  }
+  return arr[arr.length - 1];
+}
 
 export default function ClearZoneChart(p: ChartProps) {
-  const selIdx = EMB.findIndex((s) => s.key === p.slopeKey);
+  const label = KEY2LABEL[p.slopeKey];
+  const has = !!label;
+  const cz = has ? readCZ(label, p.speed) : 0;
+  const xf = has ? (X_AT_0 + cz * X_PER_M) * 100 : 0;
+  const yf = has ? SLOPE_TOP[label] * 100 : 0;
+  const axisf = AXIS_Y * 100;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4 overflow-x-auto shadow-sm">
+    <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
       <div className="text-sm font-bold text-brand-primary mb-1">شارت الخلوص الجانبي — شكل 1.15.1 (AASHTO Clear Zone)</div>
-      <div className="text-[11px] text-brand-muted mb-3">منحنى لكل سرعة من جدول الكود (جانب التعبئة Embankment). المنحنى المميّز يطابق السرعة المختارة، والنقطة الحمراء عند الميل والخلوص الناتج.</div>
-      <svg viewBox="0 0 760 560" className="w-full" style={{ minWidth: 640 }}>
-        {/* vertical band labels */}
-        <text x={26} y={(embY(0) + embY(5)) / 2} fill={C.muted} fontSize={12} fontWeight={700} textAnchor="middle" transform={`rotate(-90 26 ${(embY(0) + embY(5)) / 2})`}>ميل التعبئة (Embankment)</text>
-        <text x={26} y={(cutY(0) + cutY(5)) / 2} fill={C.muted} fontSize={12} fontWeight={700} textAnchor="middle" transform={`rotate(-90 26 ${(cutY(0) + cutY(5)) / 2})`}>ميل القطع (Cut)</text>
-
-        {/* plot frame */}
-        <line x1={X0} y1={56} x2={X0} y2={AXIS_Y} stroke={C.ink} strokeWidth={1.25} />
-        <line x1={X0} y1={AXIS_Y} x2={X40} y2={AXIS_Y} stroke={C.ink} strokeWidth={1.25} />
-
-        {/* x gridlines + labels */}
-        {[0, 5, 10, 15, 20, 25, 30, 35, 40].map((v) => (
-          <g key={v}>
-            <line x1={xS(v)} y1={56} x2={xS(v)} y2={AXIS_Y} stroke="#eef2f7" strokeWidth={1} />
-            <line x1={xS(v)} y1={AXIS_Y} x2={xS(v)} y2={AXIS_Y + 5} stroke={C.ink} strokeWidth={1} />
-            <text x={xS(v)} y={AXIS_Y + 18} fill={C.muted} fontSize={10} textAnchor="middle">{v}</text>
-          </g>
-        ))}
-        <text x={(X0 + X40) / 2} y={AXIS_Y + 36} fill={C.ink} fontSize={12} fontWeight={700} textAnchor="middle">عرض الخلوص الجانبي (م)</text>
-
-        {/* embankment slope rows + labels */}
-        {EMB.map((s, i) => (
-          <g key={s.key}>
-            <line x1={X0} y1={embY(i)} x2={X40} y2={embY(i)} stroke={i === selIdx ? "#dbe5ea" : "#f4f6f9"} strokeWidth={1} />
-            <text x={X0 - 8} y={embY(i) + 4} fill={i === selIdx ? C.primary : C.muted} fontSize={10} fontWeight={i === selIdx ? 700 : 500} textAnchor="end">{s.label}</text>
-          </g>
-        ))}
-        {/* FLAT divider */}
-        <line x1={X0} y1={FLAT_Y} x2={X40} y2={FLAT_Y} stroke={C.ink} strokeWidth={1.25} />
-        <text x={X0 - 8} y={FLAT_Y + 4} fill={C.ink} fontSize={11} fontWeight={700} textAnchor="end">FLAT</text>
-        {/* cut slope rows */}
-        {CUT_LABELS.map((lab, i) => (
-          <g key={lab}>
-            <line x1={X0} y1={cutY(i)} x2={X40} y2={cutY(i)} stroke="#f4f6f9" strokeWidth={1} />
-            <text x={X0 - 8} y={cutY(i) + 4} fill={C.muted} fontSize={10} textAnchor="end">{lab}</text>
-          </g>
-        ))}
-        <text x={(X0 + X40) / 2} y={cutY(2)} fill="#b6bcc4" fontSize={11} textAnchor="middle">منطقة القطع: غير مشمولة في جدول الكود الحالي</text>
-
-        {/* speed curves (embankment) */}
-        {SPEEDS.map((sp) => {
-          const isSel = sp === p.speed;
-          const pts = EMB.map((s, i) => `${xS(TABLE[s.key][String(sp)] || 0)},${embY(i)}`).join(" ");
-          const topX = xS(TABLE[EMB[0].key][String(sp)] || 0);
-          return (
-            <g key={sp}>
-              <polyline points={pts} fill="none" stroke={isSel ? C.primary : "#cdd4dc"} strokeWidth={isSel ? 3 : 1.25} strokeOpacity={isSel ? 1 : 0.85} strokeLinejoin="round" />
-              <text x={topX} y={embY(0) - 6} fill={isSel ? C.primary : "#aeb6bf"} fontSize={9} fontWeight={isSel ? 700 : 500} textAnchor="middle">{sp}</text>
-            </g>
-          );
-        })}
-
-        {/* selected nodes */}
-        {EMB.map((s, i) => (
-          <circle key={`n${i}`} cx={xS(TABLE[s.key][String(p.speed)] || 0)} cy={embY(i)} r={2.6} fill={C.primary} />
-        ))}
-
-        {/* result marker */}
-        {selIdx >= 0 && (
-          <g>
-            <line x1={xS(p.clearZone)} y1={embY(selIdx)} x2={xS(p.clearZone)} y2={AXIS_Y} stroke={C.danger} strokeWidth={1.25} strokeDasharray="5 3" />
-            <circle cx={xS(p.clearZone)} cy={embY(selIdx)} r={5.5} fill={C.danger} stroke="#fff" strokeWidth={1.5} />
-            <text x={xS(p.clearZone)} y={embY(selIdx) - 9} fill={C.danger} fontSize={12} fontWeight={700} textAnchor="middle" style={{ paintOrder: "stroke", stroke: "#fff", strokeWidth: 3 }}>{p.clearZone.toFixed(1)} م</text>
-          </g>
+      <div className="text-[11px] text-brand-muted mb-3">الشكل القياسي المعتمد بألوان المنصة. النقطة الحمراء = حالتك (السرعة والميل) مقروءةً على المنحنى القياسي.</div>
+      <div style={{ position: "relative", width: "100%", maxWidth: 820, margin: "0 auto" }}>
+        <img src={figUrl} alt="AASHTO Clear Zone — Figure 1.15.1" style={{ width: "100%", display: "block" }} />
+        {has && (
+          <>
+            <div style={{ position: "absolute", left: `${xf}%`, top: `${yf}%`, height: `${Math.max(0, axisf - yf)}%`, borderLeft: "2px dashed #A8483D", transform: "translateX(-1px)" }} />
+            <div style={{ position: "absolute", left: `${xf}%`, top: `${yf}%`, width: 13, height: 13, background: "#A8483D", border: "2px solid #fff", borderRadius: "50%", transform: "translate(-50%,-50%)", boxShadow: "0 0 0 1px #A8483D" }} />
+            <div style={{ position: "absolute", left: `${xf}%`, top: `${yf}%`, transform: "translate(10px,-160%)", background: "#fff", color: "#A8483D", fontSize: 11, fontWeight: 700, padding: "1px 5px", borderRadius: 4, border: "1px solid #A8483D", whiteSpace: "nowrap" }}>{cz.toFixed(1)} م</div>
+          </>
         )}
-
-        {/* legend */}
-        <line x1={X0} y1={42} x2={X0 + 22} y2={42} stroke={C.primary} strokeWidth={3} />
-        <text x={X0 + 28} y={46} fill={C.primary} fontSize={11} fontWeight={700}>السرعة المختارة: {p.speed} كم/س — وحدة الأرقام أعلى المنحنيات كم/س</text>
-      </svg>
+      </div>
+      <div className="text-[10px] text-brand-muted mt-2">قراءة استرشادية من المنحنى القياسي (قبل معامل ADT). رقم حاسبة المنصة يظهر في صندوق النتيجة.</div>
     </div>
   );
 }
