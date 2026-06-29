@@ -135,10 +135,13 @@ export default function OpposingBarrierDiagram(p: Props) {
         <VDim x={262} y1={termY} y2={yCenter} label={`Y = ${f(p.Y)} م`} color={C.muted} />
       </svg>
 
-      <div className="mt-3 inline-flex items-baseline gap-2 rounded-lg px-4 py-2" style={{ background: "#FBF6E6", border: `1px solid ${C.accent}66` }}>
-        <span className="text-xs font-bold" style={{ color: C.accent }}>الطول الكلي (سنتر) Lt②</span>
-        <span className="text-xl font-mono font-bold" style={{ color: C.accent }}>{f(p.Lt)}</span>
-        <span className="text-xs" style={{ color: C.accent }}>م</span>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <div className="text-[11px] font-mono text-brand-muted bg-slate-50 border border-slate-100 rounded px-2 py-1">L = [LH + (b/a)·L1 − L2] / [(b/a) + (LH/LR)]</div>
+        <div className="inline-flex items-baseline gap-2 rounded-lg px-4 py-2" style={{ background: "#FBF6E6", border: `1px solid ${C.accent}66` }}>
+          <span className="text-xs font-bold" style={{ color: C.accent }}>الطول الكلي (سنتر) Lt②</span>
+          <span className="text-xl font-mono font-bold" style={{ color: C.accent }}>{f(p.Lt)}</span>
+          <span className="text-xs" style={{ color: C.accent }}>م</span>
+        </div>
       </div>
     </div>
   );

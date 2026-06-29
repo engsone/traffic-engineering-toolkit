@@ -133,7 +133,7 @@ export default function BarrierLayoutDiagram(p: DiagramProps) {
 
       {/* formula + live total + special note */}
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <div className="text-[11px] font-mono text-brand-muted bg-slate-50 border border-slate-100 rounded px-2 py-1">L = (LR − L1 − L0) / (1 − a/b)</div>
+        <div className="text-[11px] font-mono text-brand-muted bg-slate-50 border border-slate-100 rounded px-2 py-1">L = [LH + (b/a)·L1 − L2] / [(b/a) + (LH/LR)]</div>
         <div className="inline-flex items-baseline gap-2 bg-brand-success/10 border border-brand-success/30 rounded-lg px-4 py-2">
           <span className="text-xs font-bold text-brand-success">الطول الكلي المعتمد Lt</span>
           <span className="text-xl font-mono font-bold text-brand-success">{f(p.Lt)}</span>
