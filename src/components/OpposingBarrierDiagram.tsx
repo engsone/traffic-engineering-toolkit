@@ -19,7 +19,8 @@ interface Props {
 
 const C = {
   ink: "#1e293b",
-  primary: "#0e7490",
+  primary: "#407189",   // barrier (same brand teal as 1.15.9)
+  accent: "#C6A230",    // gold: distinguishes the centre-referenced diagram
   success: "#3E7761",
   danger: "#A8483D",
   secondary: "#7B6756",
@@ -51,81 +52,93 @@ function VDim({ x, y1, y2, label, color }: { x: number; y1: number; y2: number; 
 }
 
 export default function OpposingBarrierDiagram(p: Props) {
-  // Mirror of 1.15.9: hazard RIGHT, terminal LEFT, for opposing traffic.
-  const yTop = 46;
-  const yEdge = 392;
-  const yAdj = 446;
-  const hzX = 726, hzW = 56, hzTop = 150, hzBot = 326;
-  const bTanX2 = hzX;                 // tangent end at hazard
-  const bTanX1 = hzX - 80;            // tangent start (L1)
-  const termX = 170, termY = 372;     // crashworthy terminal (left)
-  const bTanY = 320;
-  const posts: number[] = [0, 0.12, 0.24, 0.36, 0.48, 0.6, 0.72, 0.84, 0.96];
+  // Fig 1.15.11 (Additional Barrier for Opposing Traffic). MIRROR of 1.15.9:
+  // hazard RIGHT, terminal LEFT. All dimensions referenced to the road CENTRE
+  // line; the runout L_R starts at the centre line.
+  const yTop = 62;     // clear zone line
+  const yAsph = 330;   // asphalt edge (solid)
+  const yEdge = 358;   // edge of traveled way
+  const yCenter = 408; // road centerline (THE reference)
+  const hzX = 672, hzW = 68, hzTop = 86, hzBot = 218; // hazard box (right)
+  const bX2 = 740, bX1 = 608, bY = 294;                // straight barrier (front of hazard)
+  const termX = 282, termY = 246;                       // crashworthy terminal (left, flared back)
+  const flareN = [0.18, 0.36, 0.54, 0.72];
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-4 overflow-x-auto shadow-sm">
-      <div className="text-sm font-bold" style={{ color: C.primary }}>{p.title || "حاجز إضافي للاتجاه المعاكس — شكل 1.15.11 (Opposing Traffic)"}</div>
-      <div className="text-[11px] text-brand-muted mb-3">القياس من سنتر الطريق؛ الأبعاد تتحدّث تلقائياً من نتائج الاتجاه المعاكس.</div>
-      <svg viewBox="0 0 940 480" className="w-full" style={{ minWidth: 680 }}>
-        {/* top clear zone line for opposing traffic */}
+      <div className="text-sm font-bold" style={{ color: C.accent }}>{p.title || "حاجز إضافي للاتجاه المعاكس — شكل 1.15.11 (Opposing Traffic)"}</div>
+      <div className="text-[11px] text-brand-muted mb-3">القياس من سنتر الطريق (يُضاف عرض الحارة المعاكسة)؛ يتحدّث تلقائياً من نتائج الاتجاه المعاكس.</div>
+      <svg viewBox="0 0 940 492" className="w-full" style={{ minWidth: 680 }}>
+        {/* clear zone line */}
         <line x1={24} y1={yTop} x2={916} y2={yTop} stroke={C.ink} strokeWidth={1.5} />
-        <text x={30} y={yTop - 7} fill={C.muted} fontSize={11} fontWeight={700}>خط حرم الأمان للاتجاه المعاكس</text>
+        <text x={30} y={yTop - 8} fill={C.muted} fontSize={11} fontWeight={700}>خط حرم الأمان (Clear zone line)</text>
 
-        {/* EOP + traffic lines */}
-        <line x1={24} y1={yEdge} x2={916} y2={yEdge} stroke={C.ink} strokeWidth={2} />
-        <text x={470} y={yEdge + 16} fill={C.muted} fontSize={11} fontWeight={700} textAnchor="middle">حافة الرصف (EOP)</text>
-        <line x1={24} y1={yAdj} x2={916} y2={yAdj} stroke={C.muted} strokeWidth={1} strokeDasharray="9 6" />
-        {/* adjacent traffic (left) */}
-        <line x1={150} y1={yAdj + 14} x2={92} y2={yAdj + 14} stroke={C.muted} strokeWidth={1.5} />
-        <path d={`M92,${yAdj + 14} l9,-4 l0,8 Z`} fill={C.muted} />
-        <text x={158} y={yAdj + 18} fill={C.muted} fontSize={10} fontWeight={700}>الاتجاه المجاور</text>
-        {/* opposing traffic (right) */}
-        <line x1={760} y1={yAdj + 30} x2={818} y2={yAdj + 30} stroke={C.primary} strokeWidth={1.5} />
-        <path d={`M818,${yAdj + 30} l-9,-4 l0,8 Z`} fill={C.primary} />
-        <text x={640} y={yAdj + 34} fill={C.primary} fontSize={10} fontWeight={700}>الاتجاه المعاكس (Opposing traffic)</text>
+        {/* asphalt edge (solid) */}
+        <line x1={24} y1={yAsph} x2={916} y2={yAsph} stroke="#9aa0a6" strokeWidth={1.5} />
+        <text x={30} y={yAsph - 6} fill="#9aa0a6" fontSize={11} fontWeight={700}>حافة الأسفلت</text>
 
-        {/* hazard right */}
+        {/* edge of traveled way */}
+        <line x1={24} y1={yEdge} x2={916} y2={yEdge} stroke={C.ink} strokeWidth={1.5} />
+        <text x={470} y={yEdge - 6} fill={C.muted} fontSize={11} fontWeight={700} textAnchor="middle">خط حافة المسار</text>
+
+        {/* near lane direction (ABOVE centre) */}
+        <line x1={180} y1={384} x2={120} y2={384} stroke={C.primary} strokeWidth={1.75} />
+        <path d="M120,384 l9,-4 l0,8 Z" fill={C.primary} />
+        <text x={188} y={388} fill={C.primary} fontSize={12} fontWeight={700}>اتجاه السير</text>
+        <text x={470} y={390} fill={C.accent} fontSize={11} fontWeight={700} textAnchor="middle">⟵ حارة معاكسة 3.65 م ⟶</text>
+
+        {/* CENTRE line = reference */}
+        <line x1={24} y1={yCenter} x2={916} y2={yCenter} stroke={C.accent} strokeWidth={2.75} strokeDasharray="18 8" />
+        <text x={916} y={yCenter - 5} fill={C.accent} fontSize={12} fontWeight={800} textAnchor="end">محور الطريق (السنتر) — المرجع</text>
+
+        {/* opposing direction (BELOW centre) */}
+        <line x1={120} y1={432} x2={180} y2={432} stroke={C.accent} strokeWidth={1.75} />
+        <path d="M180,432 l-9,-4 l0,8 Z" fill={C.accent} />
+        <text x={188} y={436} fill={C.accent} fontSize={12} fontWeight={700}>اتجاه السير المعاكس</text>
+
+        {/* hazard (right) */}
         <rect x={hzX} y={hzTop} width={hzW} height={hzBot - hzTop} fill={C.secondary} fillOpacity={0.22} stroke={C.danger} strokeWidth={1.5} />
-        <line x1={hzX + hzW / 2} y1={hzTop} x2={hzX + hzW / 2 - 26} y2={hzTop - 22} stroke={C.danger} strokeWidth={1} />
-        <text x={hzX + hzW / 2 - 30} y={hzTop - 24} fill={C.danger} fontSize={12} fontWeight={700} textAnchor="end">العائق (Hazard)</text>
+        <line x1={hzX} y1={hzTop + 42} x2={hzX - 12} y2={hzTop + 42} stroke={C.danger} strokeWidth={1} />
+        <text x={hzX - 16} y={hzTop + 46} fill={C.danger} fontSize={12} fontWeight={700} textAnchor="end">العائق (Hazard)</text>
 
-        {/* runout L_R diagonal from bottom-left up to hazard back-top */}
-        <line x1={100} y1={yAdj} x2={hzX + hzW} y2={hzTop + 18} stroke={C.muted} strokeWidth={1.25} strokeDasharray="7 5" />
+        {/* runout L_R: starts at the CENTRE line, up to back-top of hazard */}
+        <line x1={226} y1={yCenter} x2={hzX} y2={hzTop + 10} stroke={C.muted} strokeWidth={1.25} strokeDasharray="7 5" />
 
-        {/* barrier tangent + flared posts from terminal (left) to hazard */}
-        <line x1={bTanX2} y1={bTanY} x2={bTanX1} y2={bTanY} stroke={C.primary} strokeWidth={3.5} />
-        <line x1={bTanX1} y1={bTanY} x2={termX} y2={termY} stroke={C.primary} strokeWidth={3.5} />
-        {posts.map((t, i) => {
-          const x = bTanX1 + (termX - bTanX1) * t;
-          const y = bTanY + (termY - bTanY) * t;
-          return <circle key={i} cx={x} cy={y} r={3} fill="#fff" stroke={C.primary} strokeWidth={2} />;
-        })}
-        {/* terminal curl (left) */}
-        <path d={`M${termX},${termY} q-16,2 -16,14 q0,10 12,8`} fill="none" stroke={C.success} strokeWidth={3} strokeLinecap="round" />
-        <text x={termX - 22} y={termY - 30} fill={C.success} fontSize={11} fontWeight={700} textAnchor="end">نهاية ماصّة للصدمات</text>
+        {/* barrier: straight (front of hazard) then flare back to terminal (left) */}
+        <line x1={bX1} y1={bY} x2={bX2} y2={bY} stroke={C.primary} strokeWidth={4} />
+        <line x1={bX1} y1={bY} x2={termX} y2={termY} stroke={C.primary} strokeWidth={4} />
+        {[636, 692, 726].map((x, i) => (
+          <circle key={`s${i}`} cx={x} cy={bY} r={3} fill="#fff" stroke={C.primary} strokeWidth={2} />
+        ))}
+        {flareN.map((t, i) => (
+          <circle key={`fl${i}`} cx={bX1 + (termX - bX1) * t} cy={bY + (termY - bY) * t} r={3} fill="#fff" stroke={C.primary} strokeWidth={2} />
+        ))}
+        {/* crashworthy terminal curl (left) */}
+        <path d={`M${termX},${termY} q-14,-2 -14,-14 q0,-10 12,-8`} fill="none" stroke={C.success} strokeWidth={3} strokeLinecap="round" />
+        <text x={termX - 12} y={termY - 22} fill={C.success} fontSize={12} fontWeight={700} textAnchor="end">نهاية ماصّة للصدمات</text>
 
-        {/* flare a:b */}
-        <g transform="translate(458,338)">
-          <path d="M0,0 L-52,0 L-52,-15 Z" fill="none" stroke={C.ink} strokeWidth={1.25} />
-          <text x={-26} y={12} fill={C.ink} fontSize={11} fontWeight={700} textAnchor="middle">a</text>
-          <text x={-58} y={-6} fill={C.ink} fontSize={11} fontWeight={700} textAnchor="end">b</text>
+        {/* flare ratio a:b (filled triangle) */}
+        <g transform="translate(392,242)">
+          <path d="M0,0 L80,0 L80,16 Z" fill={C.primary} fillOpacity={0.15} stroke={C.ink} strokeWidth={1.25} />
+          <text x={40} y={-5} fill={C.ink} fontSize={11} fontWeight={700} textAnchor="middle">b</text>
+          <text x={86} y={11} fill={C.ink} fontSize={11} fontWeight={700}>a</text>
         </g>
 
-        {/* dims */}
-        <VDim x={64} y1={yTop} y2={yAdj} label={`LC = ${f(p.lc ?? p.lh)} م`} color={C.secondary} />
-        <HDim x1={100} x2={hzX + hzW} y={92} label={`LR = ${f(p.lr)} م`} color={C.muted} />
-        <HDim x1={termX} x2={bTanX2} y={128} label={`طول الحماية الإضافي L = ${f(p.L)} م`} color={C.success} />
-        <HDim x1={bTanX1} x2={bTanX2} y={302} label={`L1 = ${f(p.l1)} م`} color={C.primary} />
-        <HDim x1={hzX} x2={hzX + hzW} y={hzBot + 16} label={`L0 = ${f(p.l0)} م`} color={C.danger} />
-        <VDim x={hzX + hzW + 26} y1={hzTop} y2={yEdge} label={`LH = ${f(p.lh)} م`} color={C.ink} />
-        <VDim x={termX - 44} y1={termY} y2={yEdge} label={`Y = ${f(p.Y)} م`} color={C.muted} />
-        <VDim x={hzX - 14} y1={bTanY} y2={yEdge} label={`L2 = ${f(p.l2)} م`} color={C.secondary} />
+        {/* dimensions (from CENTRE) */}
+        <HDim x1={226} x2={hzX} y={88} label={`LR = ${f(p.lr)} م`} color={C.muted} />
+        <HDim x1={termX} x2={bX2} y={130} label={`طول الحماية الإضافي L = ${f(p.L)} م`} color={C.success} />
+        <HDim x1={hzX} x2={hzX + hzW} y={hzBot + 14} label={`L0 = ${f(p.l0)} م`} color={C.danger} />
+        <HDim x1={bX1} x2={hzX} y={312} label={`L1 = ${f(p.l1)} م`} color={C.primary} />
+        <VDim x={900} y1={yTop} y2={yCenter} label={`LC = ${f(p.lc ?? p.lh)} م`} color={C.secondary} />
+        <VDim x={852} y1={hzTop} y2={yCenter} label={`LH = ${f(p.lh)} م`} color={C.ink} />
+        <VDim x={582} y1={bY} y2={yCenter} label={`L2 = ${f(p.l2)} م`} color={C.accent} />
+        <VDim x={262} y1={termY} y2={yCenter} label={`Y = ${f(p.Y)} م`} color={C.muted} />
       </svg>
 
-      <div className="mt-3 inline-flex items-baseline gap-2 bg-cyan-50 border border-cyan-200 rounded-lg px-4 py-2">
-        <span className="text-xs font-bold" style={{ color: C.primary }}>الطول الكلي (سنتر) Lt②</span>
-        <span className="text-xl font-mono font-bold" style={{ color: C.primary }}>{f(p.Lt)}</span>
-        <span className="text-xs" style={{ color: C.primary }}>م</span>
+      <div className="mt-3 inline-flex items-baseline gap-2 rounded-lg px-4 py-2" style={{ background: "#FBF6E6", border: `1px solid ${C.accent}66` }}>
+        <span className="text-xs font-bold" style={{ color: C.accent }}>الطول الكلي (سنتر) Lt②</span>
+        <span className="text-xl font-mono font-bold" style={{ color: C.accent }}>{f(p.Lt)}</span>
+        <span className="text-xs" style={{ color: C.accent }}>م</span>
       </div>
     </div>
   );
