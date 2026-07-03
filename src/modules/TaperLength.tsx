@@ -23,7 +23,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
   const recommendedValue = lHighSpeed;
 
   const handleCopy = () => {
-    const text = `حساب طول المنطقة الانتقالية (Taper Length):\n- عرض الإزاحة (W) = ${w} م\n- السرعة (S) = ${s} كم/ساعة\n- المعادلة المعتمدة (S >= 70): L = ${lHighSpeed.toFixed(2)} م\n- القيمة الموصى بها = ${recommendedValue.toFixed(2)} م\n- مرجع: كود الطرق السعودي 401`;
+    const text = `حساب طول المنطقة الانتقالية (Taper Length):\n- عرض الإزاحة (W) = ${w} م\n- السرعة (S) = ${s} كم/ساعة\n- المعادلة المعتمدة (S >= 70): L = ${lHighSpeed.toFixed(2)} م\n- القيمة الموصى بها = ${recommendedValue.toFixed(2)} م\n- مرجع: كود الطرق السعودي 305`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -51,7 +51,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
         "الموصى به (L) م": "m",
         "معادلة السرعات م": "m",
       },
-      notes: `سرعة ${s} كم/ساعة، استخدام معادلة السرعات لـ 70 كم/س فأكثر. المرجع: كود الطرق السعودي 401.`,
+      notes: `سرعة ${s} كم/ساعة، استخدام معادلة السرعات لـ 70 كم/س فأكثر. المرجع: كود الطرق السعودي 305، بند 4-1.`,
       isSafe: true,
     });
     setSaved(true);
@@ -70,7 +70,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
           {/* Inputs Panel */}
           <div className="space-y-4">
             <h3 className="font-semibold text-gray-800 border-r-4 border-brand-primary pr-3 text-base">منظومة البيانات المدخلة</h3>
-            
+
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
                 عرض الإزاحة الجانبية (W) - بالمتر
@@ -139,7 +139,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
           <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col justify-between">
             <div>
               <h3 className="font-semibold text-gray-800 mb-4 text-base">مخرجات الحساب الفني</h3>
-              
+
               <div className="space-y-4">
                 {/* Proposed Output */}
                 <div className="p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
@@ -176,7 +176,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
       {/* Official Lookup table / Typos alert */}
       <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <h3 className="font-bold text-gray-800 text-base">جدول المقارنة الاسترشادي القياسي (كود 401)</h3>
+          <h3 className="font-bold text-gray-800 text-base">جدول المقارنة الاسترشادي القياسي (كود 305، جدول 4-1)</h3>
           <span className="text-[11px] bg-slate-100 text-slate-700 px-2 py-1 rounded font-medium">الوحدات: متر للأطوال، كيلومتر/ساعة للسرعات</span>
         </div>
 
@@ -184,7 +184,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
         <div className="mb-4 bg-brand-success/10 border-r-4 border-brand-success p-3 rounded-lg flex items-start gap-2.5">
           <Check className="w-5 h-5 text-brand-success shrink-0 mt-0.5" />
           <div className="text-xs text-gray-800 leading-relaxed">
-            <span className="font-bold">مراجعة وتصحيح الكود:</span> تم تصحيح الخطأ المطبعي للسرعة <span className="font-mono font-bold">55 كم/ساعة</span> وعرض الإزاحة <span className="font-mono font-bold">3.0 م</span> (حيث تظهر كـ 90م في بعض النسخ القديمة)، ونعتمد هنا القيمة الهندسية الصحيحة وهي <span className="font-mono font-bold text-brand-success">58م</span> لضمان دقة العمليات.
+            <span className="font-bold">مراجعة وتصحيح الكود:</span> عند السرعة <span className="font-mono font-bold">55 كم/ساعة</span> وعرض الإزاحة <span className="font-mono font-bold">3.0 م</span> تظهر في النسخة الرسمية المتاحة من كود 305 (جدول 4-1) القيمة <span className="font-mono font-bold">48م</span> حرفياً، وهي قيمة غير متسقة مع تسلسل الجدول (بين 54م عند 2.75م و63م عند 3.25م). نعرض هنا القيمة المصححة هندسياً <span className="font-mono font-bold text-brand-success">58م</span> بالاستيفاء الخطي، لكنها تفسير غير رسمي وليست نصاً معتمداً من الهيئة العامة للطرق — يلزم التحقق من صورة الجدول الأصلية أو استفسار رسمي قبل الاعتماد التنفيذي.
           </div>
         </div>
 
