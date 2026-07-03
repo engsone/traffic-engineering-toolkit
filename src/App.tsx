@@ -9,6 +9,7 @@ import { CalculationRecord } from "./types";
 // Import modules
 import Overview from "./modules/Overview";
 import TaperLength from "./modules/TaperLength";
+import TrafficDiversions from "./modules/TrafficDiversions";
 import PavementMarkings from "./modules/PavementMarkings";
 import RumbleStrips from "./modules/RumbleStrips";
 import DividedBarrier from "./modules/DividedBarrier";
@@ -24,24 +25,25 @@ import StandardDrawingsList from "./modules/StandardDrawingsList";
 import AttachmentsView from "./modules/AttachmentsView";
 import HistoryView from "./modules/HistoryView";
 
-import { 
-  Home, 
-  Settings, 
-  Menu, 
-  X, 
-  FileText, 
-  Grid, 
-  AlertTriangle, 
-  History, 
-  ShieldCheck, 
-  Paintbrush, 
-  Compass, 
-  BookOpen, 
-  Layers, 
-  Clock, 
-  Printer, 
+import {
+  Home,
+  Settings,
+  Menu,
+  X,
+  FileText,
+  Grid,
+  AlertTriangle,
+  History,
+  ShieldCheck,
+  Paintbrush,
+  Compass,
+  BookOpen,
+  Layers,
+  Clock,
+  Printer,
   Share2,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Cone
 } from "lucide-react";
 
 export default function App() {
@@ -87,6 +89,7 @@ export default function App() {
   const navItems = [
     { id: "overview", label: "الصفحة الرئيسية", icon: Home, group: "عام" },
     { id: "taper", label: "المنطقة الانتقالية / Taper Length", icon: Layers, group: "حسابات السلامة" },
+    { id: "diversions", label: "التحويلات المرورية ومناطق العمل", icon: Cone, group: "حسابات السلامة" },
     { id: "markings", label: "الدهانات والعلامات الأرضية", icon: Paintbrush, group: "حسابات السلامة" },
     { id: "rumble", label: "المطبات الاهتزازية / Rumble Strips", icon: AlertTriangle, group: "حسابات السلامة" },
     { id: "divided_barrier", label: "الحواجز المعدنية — طرق مزدوجة", icon: ShieldCheck, group: "حواجز وحمايات" },
@@ -114,14 +117,21 @@ export default function App() {
     switch (currentModule) {
       case "overview":
         return (
-          <Overview 
-            onNavigateToModule={(modId) => setCurrentModule(modId)} 
+          <Overview
+            onNavigateToModule={(modId) => setCurrentModule(modId)}
             lastRecord={lastRecord}
             historyLength={history.length}
           />
         );
       case "taper":
         return <TaperLength onSaveCalculation={handleSaveCalculation} />;
+      case "diversions":
+        return (
+          <TrafficDiversions
+            onSaveCalculation={handleSaveCalculation}
+            onNavigateToModule={(modId) => setCurrentModule(modId)}
+          />
+        );
       case "markings":
         return <PavementMarkings onSaveCalculation={handleSaveCalculation} />;
       case "rumble":
@@ -161,7 +171,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F2F4F7] flex flex-col antialiased selection:bg-brand-primary selection:text-white" dir="rtl">
-      
+
       {/* Top Main Navigation Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40 print:hidden shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
@@ -213,7 +223,7 @@ export default function App() {
 
       {/* Main shell Layout */}
       <div className="flex-1 max-w-7xl w-full mx-auto flex">
-        
+
         {/* Sticky Desktop Side Navigation Panel on the right (for RTL) */}
         <aside className="w-64 border-l border-[#325a6e]/20 bg-brand-primary text-white hidden md:block shrink-0 print:hidden h-[calc(100vh-3.5rem)] sticky top-14 overflow-y-auto">
           <nav className="p-3 space-y-4">
