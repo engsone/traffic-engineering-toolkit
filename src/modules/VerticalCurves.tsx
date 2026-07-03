@@ -11,24 +11,31 @@ interface Props {
   onSaveCalculation: (calc: Omit<CalculationRecord, "id" | "timestamp">) => void;
 }
 
-// Recommended K factors according to SRC-301 (AASHTO)
+// القيم الموصى بها لمعامل K لمنحنيات القمة والقاع الرأسية حسب السرعة التصميمية لجميع فئات الطرق
+// مصدر: كود الطرق السعودي 301، الجدول (4-18) — ص PDF 88 (تم التحقق من النص الأصلي حرفياً).
+// القيم المعتمدة هنا هي عمود "لكفاية مسافة الرؤية للتوقف (SSD)" وهو معيار التصميم العام
+// المستخدم افتراضياً (وليس عمودي مسافة رؤية التجاوز الخاصين بالطرق ثنائية المسار).
+// الجدول السابق في هذا الملف (شبكة سرعات 40-140 غير متجانسة) كان يحوي قيماً غير مطابقة للكود.
 const RECOMMENDED_K_VALUES: Record<number, { crest: number; sag: number }> = {
-  40: { crest: 4, sag: 10 },
-  50: { crest: 11, sag: 17 },
-  60: { crest: 17, sag: 17 },
-  70: { crest: 23, sag: 20 },
-  80: { crest: 30, sag: 26 },
-  90: { crest: 38, sag: 33 },
-  105: { crest: 45, sag: 45 },
-  120: { crest: 95, sag: 66 },
-  130: { crest: 120, sag: 82 },
-  140: { crest: 150, sag: 95 }
+  20: { crest: 1, sag: 2 },
+  30: { crest: 2, sag: 5 },
+  40: { crest: 4, sag: 8 },
+  50: { crest: 6, sag: 12 },
+  60: { crest: 11, sag: 17 },
+  70: { crest: 17, sag: 23 },
+  80: { crest: 26, sag: 29 },
+  90: { crest: 39, sag: 38 },
+  100: { crest: 52, sag: 45 },
+  110: { crest: 74, sag: 54 },
+  120: { crest: 95, sag: 63 },
+  130: { crest: 123, sag: 73 },
+  140: { crest: 161, sag: 84 }
 };
 
 export default function VerticalCurves({ onSaveCalculation }: Props) {
   const [g1, setG1] = useState<number>(3.0); // +3%
   const [g2, setG2] = useState<number>(-1.0); // -1%
-  const [kFactor, setKFactor] = useState<number>(30); // vertical curve coefficient K
+  const [kFactor, setKFactor] = useState<number>(26); // vertical curve coefficient K
   const [curveType, setCurveType] = useState<"crest" | "sag">("crest");
   const [designSpeed, setDesignSpeed] = useState<number>(80);
 
@@ -66,7 +73,7 @@ export default function VerticalCurves({ onSaveCalculation }: Props) {
   const handleReset = () => {
     setG1(3.0);
     setG2(-1.0);
-    setKFactor(30);
+    setKFactor(26);
     setCurveType("crest");
     setDesignSpeed(80);
     setSaved(false);
@@ -207,13 +214,16 @@ export default function VerticalCurves({ onSaveCalculation }: Props) {
                   }}
                   className="w-full text-xs border border-gray-300 rounded bg-white p-1.5 focus:ring-1 focus:ring-brand-primary outline-none"
                 >
+                  <option value="20">20 كم/ساعة</option>
+                  <option value="30">30 كم/ساعة</option>
                   <option value="40">40 كم/ساعة</option>
                   <option value="50">50 كم/ساعة</option>
                   <option value="60">60 كم/ساعة</option>
                   <option value="70">70 كم/ساعة</option>
                   <option value="80">80 كم/ساعة</option>
                   <option value="90">90 كم/ساعة</option>
-                  <option value="105">105 كم/ساعة</option>
+                  <option value="100">100 كم/ساعة</option>
+                  <option value="110">110 كم/ساعة</option>
                   <option value="120">120 كم/ساعة</option>
                   <option value="130">130 كم/ساعة</option>
                   <option value="140">140 كم/ساعة</option>
@@ -305,10 +315,10 @@ export default function VerticalCurves({ onSaveCalculation }: Props) {
       <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
         <div className="flex items-center gap-2 mb-3 border-r-4 border-brand-secondary pr-2">
           <Compass className="w-5 h-5 text-brand-secondary" />
-          <h4 className="font-bold text-gray-800 text-sm">العتبات التصميمية لمعيار K الموصى بها (كود 301 / AASHTO)</h4>
+          <h4 className="font-bold text-gray-800 text-sm">العتبات التصميمية لمعيار K الموصى بها (كود 301 — الجدول 4-18)</h4>
         </div>
         <p className="text-xs text-gray-500 mb-4">
-          يعد K هو المسافة اللازمة لتغير الميل الرأسي بنسبة 1%، ويحدد قيمته لضمان الأمان البصري ومسافات التوقف الكافية ليلًا:
+          يعد K هو المسافة اللازمة لتغير الميل الرأسي بنسبة 1%، ويحدد قيمته لضمان الأمان البصري ومسافات التوقف الكافية ليلًا. القيم أدناه معتمدة على معيار مسافة الرؤية للتوقف (SSD) لجميع فئات الطرق:
         </p>
 
         <div className="overflow-x-auto">
@@ -318,7 +328,6 @@ export default function VerticalCurves({ onSaveCalculation }: Props) {
                 <th className="p-2 text-right">السرعة التصميمية للطريق (كم/س)</th>
                 <th className="p-2 text-brand-primary">معامل المنحنى المحدب القمة (K Crest)</th>
                 <th className="p-2 text-brand-danger">معامل المنحنى المقعر القاع (K Sag)</th>
-                <th className="p-2">ملاحظة الكود الميدانية</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 font-mono text-gray-700">
@@ -332,9 +341,6 @@ export default function VerticalCurves({ onSaveCalculation }: Props) {
                     <td className="p-2 text-right font-sans font-bold text-slate-900">{spd} كم/ساعة</td>
                     <td className="p-2 text-brand-primary font-bold">{val.crest}</td>
                     <td className="p-2 text-brand-danger font-bold">{val.sag}</td>
-                    <td className="p-2 text-right font-sans text-gray-500 text-[10px]">
-                      {spd >= 120 ? "سرعة طريق حرة سريعة" : "شوارع حضرية وتجميعية"}
-                    </td>
                   </tr>
                 );
               })}

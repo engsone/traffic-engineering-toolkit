@@ -199,7 +199,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
                 <th className="p-3 text-xs font-semibold text-gray-500">W = 3.0م</th>
                 <th className="p-3 text-xs font-semibold text-gray-500">W = 3.25م</th>
                 <th className="p-3 text-xs font-semibold text-gray-500">W = 3.5م</th>
-                <th className="p-3 text-xs font-semibold text-gray-500">W = 3.75م</th>
+                <th className="p-3 text-xs font-semibold text-gray-500">W = 3.65م</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 font-mono">
@@ -219,7 +219,7 @@ export default function TaperLength({ onSaveCalculation }: Props) {
                   <td className="p-2.5 text-xs text-slate-900 font-medium bg-slate-50/40">{row.w30} م</td>
                   <td className="p-2.5 text-xs text-gray-800">{row.w325} م</td>
                   <td className="p-2.5 text-xs text-gray-800">{row.w35} م</td>
-                  <td className="p-2.5 text-xs text-gray-800">{row.w375} م</td>
+                  <td className="p-2.5 text-xs text-gray-800">{row.w365} م</td>
                 </tr>
               ))}
             </tbody>
