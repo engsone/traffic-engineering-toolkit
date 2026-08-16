@@ -5,11 +5,17 @@
 
 import React, { useState, useEffect } from "react";
 import { CalculationRecord } from "../types";
-import { Copy, Save, RotateCcw, Check, AlertTriangle, ShieldAlert } from "lucide-react";
 import BarrierLayoutDiagram from "../components/BarrierLayoutDiagram";
 import OpposingBarrierDiagram from "../components/OpposingBarrierDiagram";
 import BarrierTypesTable from "../components/BarrierTypesTable";
-import { ROADSIDE_DESIGN_LOOKUP } from "../data/lookupTables";
+import { Copy, Save, RotateCcw, Check, AlertTriangle, ShieldAlert } from "lucide-react";
+import {
+  ADT_BANDS,
+  AdtBand,
+  getRunoutLength,
+  getFlareRate,
+  getShyLine
+} from "../data/lookupTables";
 
 interface Props {
   onSaveCalculation: (calc: Omit<CalculationRecord, "id" | "timestamp">) => void;
@@ -19,8 +25,9 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
   // Common inputs
   const [speed, setSpeed] = useState<number>(80);
   const [barrierType, setBarrierType] = useState<"steel" | "concrete">("steel");
-  const [lr, setLr] = useState<number>(100);
-  const [flareRatio, setFlareRatio] = useState<number>(11);
+  const [adtBand, setAdtBand] = useState<AdtBand>("5000to10000");
+  const [lr, setLr] = useState<number>(58);
+  const [flareRatio, setFlareRatio] = useState<number>(21);
   const [l1, setL1] = useState<number>(8); // Default 8m as requested
   const [l0, setL0] = useState<number>(20);
   const [terminalLength, setTerminalLength] = useState<number>(3.80);
@@ -31,17 +38,24 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
   const [l2, setL2] = useState<number>(1.5);
   const [l3, setL3] = useState<number>(3.0); // Default L3
 
+  const [lrInterpolated, setLrInterpolated] = useState<boolean>(false);
+  const [flareLabel, setFlareLabel] = useState<string>("");
   const [saved, setSaved] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
 
-  // Auto-fill from lookup tables on speed or barrier type change
+  const ls = getShyLine(speed);
+
+  // Auto-fill from AASHTO RSDG tables (5-10a / 5-7 / 5-9)
   useEffect(() => {
-    const config = ROADSIDE_DESIGN_LOOKUP.find(r => r.speed === speed);
-    if (config) {
-      setLr(config.lr);
-      setFlareRatio(barrierType === "steel" ? config.steel_flare : config.concrete_flare);
-    }
-  }, [speed, barrierType]);
+    const runout = getRunoutLength(speed, adtBand);
+    setLr(runout.lr);
+    setLrInterpolated(runout.interpolated);
+
+    const shyLine = getShyLine(speed);
+    const flare = getFlareRate(speed, barrierType, l2, shyLine);
+    setFlareRatio(flare.rate);
+    setFlareLabel(flare.labelAr);
+  }, [speed, barrierType, adtBand, l2]);
 
   // Formulas solver
   const flareFraction = 1 / flareRatio;
@@ -69,8 +83,12 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
   const totalLt = ltYellow + ltCenter - l0;
   const governingCase = ltYellow >= ltCenter ? "yellow" : "centerline";
 
+  const adtLabel = ADT_BANDS.find(b => b.key === adtBand)?.labelAr || "";
+
   const handleCopy = () => {
     const text = `تصميم حواجز الحماية الجانبية (الطرق المفردة غير المقسمة) - سرعة ${speed} كم/ساعة:
+- حجم المرور اليومي ADT: ${adtLabel}
+- طول الخروج LR = ${lr} م (جدول 5-10a${lrInterpolated ? " — قيمة مستوفاة" : ""}) | خط النفور LS = ${ls} م | الفلير 1:${flareRatio} (${flareLabel})
 [1] الحساب الأول (من خط الحافة الأصفر):
 - إزاحة العائق LH = ${lhYellow} م
 - إزاحة وجه الحاجز L2 = ${l2} م
@@ -89,7 +107,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
 - الطول المعتمد (مجموع الحسابين) = ${totalLt.toFixed(2)} متر
 - شامل حسم مساهمة Lt① و Lt② معاً لتأمين الاتجاهين.
 
-المرجع الرسمي: مواصفات AASHTO تفادياً للاصطدام العكسي والتقاطعي`;
+المرجع: AASHTO Roadside Design Guide — الطبعة الرابعة 2011 (تصحيحات 2012 و2015)، القسم 5`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -98,11 +116,10 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
 
   const handleReset = () => {
     setSpeed(80);
-    setLr(95);
+    setAdtBand("5000to10000");
     setL1(8);
     setL2(1.5);
     setL3(3.0);
-    setFlareRatio(15);
     setL0(20);
     setTerminalLength(3.80);
     setLaneWidth(3.65);
@@ -116,12 +133,14 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
       calculatorName: "حواجز الطريق المفرد (Undivided Road Barriers)",
       inputs: {
         "السرعة كم/ساعة": speed,
+        "حجم المرور اليومي ADT": adtLabel,
         "إزاحة عائق خط الحافة (LH) م": lhYellow,
         "بعد الحاجز عن الخط الأصفر (L2) م": l2,
         "بعد العائق عن الخط الأصفر (L3) م": l3,
         "عرض الحارة المعاكسة م": laneWidth,
-        "طول الانحراف (LR) م": lr,
-        "نسبة الانحراف a:b": `1:${flareRatio}`,
+        "طول الخروج (LR) م": lr,
+        "خط النفور (LS) م": ls,
+        "نسبة الفلير a:b": `1:${flareRatio}`,
         "طول العائق الطولي (L0) م": l0,
         "طول النهاية المعتمدة م": terminalLength,
         "طول مقطع البداية (L1) م": l1,
@@ -140,7 +159,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
         "الحساب 2: إجمالي طول الحاجز م": "m",
         "الطول الكلي المعتمد (المجموع) م": "m",
       },
-      notes: `تصميم حواجز السلامة لطريق مفرد حارتين. القيمة المعتمدة هي مجموع الحسابين (Lt① + Lt②) لتأمين حركة السير من كلا الاتجاهين حسب مواصفات AASHTO.`,
+      notes: `تصميم حواجز السلامة لطريق مفرد حارتين. القيمة المعتمدة هي مجموع الحسابين (Lt① + Lt②) لتأمين حركة السير من كلا الاتجاهين. المرجع: AASHTO RSDG الطبعة الرابعة — الجداول 5-7 و5-9 و5-10(a) مع ADT ${adtLabel}.`,
       isSafe: true
     });
     setSaved(true);
@@ -170,7 +189,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
       {/* Shareable inputs */}
       <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
         <h3 className="font-bold text-gray-800 text-sm border-r-4 border-brand-primary pr-3">المعطيات والمواصفات العامة للطريق والسرعة</h3>
-        
+
         {/* Barrier Type Selection */}
         <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <span className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
@@ -190,7 +209,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              معدني (Metal)
+              معدني شبه صلب (Semi-Rigid)
             </button>
             <button
               type="button"
@@ -204,9 +223,45 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              خرساني (Concrete)
+              خرساني صلب (Rigid)
             </button>
           </div>
+        </div>
+
+        {/* ADT band selector — Table 5-10(a) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 bg-amber-50/60 p-2.5 rounded-lg border border-amber-200/60">
+          <div className="col-span-full text-[11px] font-bold text-amber-800 mb-1 pr-1">
+            حجم المرور اليومي ADT — متغير أساسي في جدول 5-10(a) لتحديد طول الخروج LR:
+          </div>
+          {ADT_BANDS.map((band) => (
+            <button
+              key={band.key}
+              onClick={() => {
+                setAdtBand(band.key);
+                setSaved(false);
+              }}
+              className={`py-1.5 px-2 text-[11px] font-semibold rounded border transition-all ${
+                adtBand === band.key
+                  ? "bg-brand-warning text-white border-brand-warning shadow-sm"
+                  : "bg-white text-gray-700 border-amber-200 hover:bg-amber-50"
+              }`}
+            >
+              {band.labelAr}
+            </button>
+          ))}
+        </div>
+
+        {/* Auto-derived values strip */}
+        <div className="flex flex-wrap gap-2 text-[11px]">
+          <span className="bg-slate-100 border border-slate-200 rounded px-2.5 py-1 font-mono">
+            LR = <b>{lr}</b> م {lrInterpolated && <span className="text-brand-warning font-sans font-bold">(مستوفى)</span>}
+          </span>
+          <span className="bg-slate-100 border border-slate-200 rounded px-2.5 py-1 font-mono">
+            LS = <b>{ls}</b> م
+          </span>
+          <span className="bg-slate-100 border border-slate-200 rounded px-2.5 py-1 font-mono">
+            الفلير 1:<b>{flareRatio}</b> <span className="font-sans text-gray-600">({flareLabel})</span>
+          </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -225,7 +280,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">مسافة وصول المركبة للعائق (LR) م</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">طول الخروج (LR) م — تلقائي من جدول 5-10a</label>
             <input
               type="number"
               value={lr}
@@ -238,7 +293,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">نسبة انحراف الحاجز a:b (أدخل b فقط)</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">نسبة الفلير a:b (أدخل b فقط) — تلقائي من 5-9</label>
             <input
               type="number"
               value={flareRatio}
@@ -307,9 +362,9 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
 
       {/* Dual measurements calculators side-by-side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
+
         {/* Card ①: Measured from Yellow Edge Line */}
-        <div className="rounded-xl overflow-hidden shadow-sm transition-all duration-300" 
+        <div className="rounded-xl overflow-hidden shadow-sm transition-all duration-300"
              style={{
                backgroundColor: '#fff7ed',
                border: '2px solid #f59e0b'
@@ -355,6 +410,9 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
                 }}
                 className="w-full text-left font-mono text-sm bg-white border border-[#fed7aa] rounded px-3 py-1.5 focus:ring-1 focus:ring-[#f59e0b] outline-none text-[#1e293b] font-medium"
               />
+              <div className="text-[10px] text-amber-700 mt-0.5">
+                {l2 < ls ? `L2 < LS (${ls}م) → داخل خط النفور` : `L2 ≥ LS (${ls}م) → عند/خارج خط النفور`}
+              </div>
             </div>
 
             <div>
@@ -482,7 +540,7 @@ export default function UndividedBarrier({ onSaveCalculation }: Props) {
               <div className="bg-[#f59e0b] text-[#1e293b] font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider">
                 التوصية الهندسية النهائية
               </div>
-              <span className="text-[11px] text-cyan-200 font-medium">حسب مواصفات AASHTO</span>
+              <span className="text-[11px] text-cyan-200 font-medium">وفق AASHTO RSDG الطبعة الرابعة — الجداول 5-7 و5-9 و5-10(a)</span>
             </div>
             <h3 className="text-sm md:text-base font-bold text-white mt-1 leading-relaxed">
               طول الحاجز الكلي المعتمد للتركيب (Lt) = مجموع <span className="text-[#f59e0b] font-mono">Lt①</span> + <span className="text-[#38bdf8] font-mono">Lt②</span>
