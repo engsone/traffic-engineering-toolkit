@@ -18,6 +18,8 @@ import {
   BASE_CLEAR_ZONE_TABLE
 } from "../data/lookupTables";
 import { CalculationRecord } from "../types";
+import BarrierLayoutDiagram from "../components/BarrierLayoutDiagram";
+import BarrierTypesTable from "../components/BarrierTypesTable";
 import { Copy, Save, RotateCcw, Check, AlertTriangle, Shield } from "lucide-react";
 
 interface Props {
@@ -612,6 +614,9 @@ export default function DividedBarrier({ onSaveCalculation }: Props) {
           </p>
         </div>
       </div>
+      {/* إضافات بصرية مرجعية (لا تؤثر على الحسابات) */}
+      <BarrierLayoutDiagram lh={lh} lr={lr} l1={l1} l2={l2} l0={l0} terminal={terminalLength} lc={lc} L={finalL} Y={finalY} Lt={finalLt} isLhExceedsLc={isLhExceedsLc} />
+      <BarrierTypesTable />
     </div>
   );
 }
